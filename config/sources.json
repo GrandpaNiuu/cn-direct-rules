@@ -1,12 +1,30 @@
 {
   "ipv4": {
-    "url": "https://raw.githubusercontent.com/fernvenue/chn-cidr-list/master/ipv4.txt",
+    "urls": [
+      "https://raw.githubusercontent.com/fernvenue/chn-cidr-list/master/ipv4.txt",
+      "https://gitlab.com/fernvenue/chn-cidr-list/-/raw/master/ipv4.txt"
+    ],
     "min_entries": 5000,
-    "max_entries": 7000
+    "max_entries": 7000,
+    "max_bytes": 1000000
   },
   "ipv6": {
-    "url": "https://raw.githubusercontent.com/fernvenue/chn-cidr-list/master/ipv6.txt",
+    "urls": [
+      "https://raw.githubusercontent.com/fernvenue/chn-cidr-list/master/ipv6.txt",
+      "https://gitlab.com/fernvenue/chn-cidr-list/-/raw/master/ipv6.txt"
+    ],
     "min_entries": 1800,
-    "max_entries": 3200
+    "max_entries": 3200,
+    "max_bytes": 1000000
+  },
+  "domains": {
+    "urls": [
+      "https://codeload.github.com/v2fly/domain-list-community/tar.gz/refs/heads/master",
+      "https://api.github.com/repos/v2fly/domain-list-community/tarball/master"
+    ],
+    "root": "cn",
+    "min_entries": 6000,
+    "max_entries": 12000,
+    "max_bytes": 12000000
   }
 }

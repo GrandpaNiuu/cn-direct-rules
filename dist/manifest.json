@@ -1,23 +1,40 @@
 {
   "counts": {
     "asns": 73,
-    "domain_keywords": 29,
-    "domain_suffixes": 1057,
-    "exact_domains": 2,
+    "domains": {
+      "max": {
+        "exact": 63,
+        "keywords": 29,
+        "suffixes": 7858
+      },
+      "strict": {
+        "exact": 63,
+        "keywords": 29,
+        "suffixes": 7844
+      }
+    },
     "ipv4": 5690,
     "ipv6": 2264
   },
   "files": {
-    "clash/cn.yaml": "d965d79cf9852b62ef5f721647075cc187638e41f462c707f8a99f42347dd2b0",
-    "cn-domain.conf": "1031cad69090eaf00350987ee668f2b6ea308bbff5552666b455b338175adbf1",
+    "clash/cn-max.yaml": "a31584880827251e08c57b98ef67ced97f4a218ed37f145d39ec09e404af2332",
+    "clash/cn.yaml": "6ede76734d7e279925aee1ab85fa0bc381a70c2fc23062ba321d9a34d5b156ef",
+    "cn-domain.conf": "ad211d151883323c748d57dbf082200e3c24fd8c91f5e3026b6d2bda3211ecb1",
     "cn-ip.conf": "6c4396671a36f9c67edc7e31b27340e7d2c1585840d336c13d9111d2a22e9349",
     "cn-ipv4.conf": "fda668b205f494fc729b944ca29545da639969f4fb88f5e3373fbd885d7c3af2",
     "cn-ipv6.conf": "fa5b81b178b170f219945aed048c52a54450ec3ba8d9d892944208ebc85a1eb8",
-    "cn.conf": "fe184f5f45a9899dcb1a2c821482ba3b4e2026789c235376152ba1dba3d0018a"
+    "cn-max-domain.conf": "854b1d6f5d3b8d3946778bc7252de8a741dad786754e2a0cb2748ea479802999",
+    "cn-max.conf": "9d74a8c55f1e7471a17e81bfd1418e347f82b644b4a32e33dd6fff8629e336a4",
+    "cn.conf": "e00db5e86f805db7f68c12a1008107f2a7d95d9d00b113bb5bd257b1a0fa289c",
+    "rule-set/cn-max.list": "40d8cf5323fdc6bc025428cff9952c166bd20608851f569886dd24a53c01a366",
+    "rule-set/cn.list": "c6f860edff7a5b78ba8abd7061f0a9e1dff26ba0858bc700180387456655a197",
+    "shadowrocket/cn-direct.sgmodule": "0c60637352af66f5d1aee563baf836e41e24b96d68501b440a35647876f688ef"
   },
   "schema_version": 1,
   "upstream": {
+    "domains_sha256": "931f7940dc7761986ac1056bdcf4b9dcb74ff9f4b1507f8cfcae6476d2cf1c57",
     "ipv4_sha256": "38b733d6fc888df2c0d2290f099ef4dccd3c73df595a85a28ebdbf1000e2f9cc",
-    "ipv6_sha256": "e6768f1b2a0304d5ed215d981186380e62fde66aa47559edf440858c27b56c70"
+    "ipv6_sha256": "e6768f1b2a0304d5ed215d981186380e62fde66aa47559edf440858c27b56c70",
+    "skipped_domain_regexes": 3
   }
 }
