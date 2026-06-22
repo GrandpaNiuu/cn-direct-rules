@@ -74,6 +74,7 @@ jobs:
             dist/clash/cn-max.yaml \
             dist/rule-set/cn.list \
             dist/rule-set/cn-max.list \
+            dist/shadowrocket/cn-direct.sgmodule \
             dist/manifest.json \
             dist/SHA256SUMS \
             --title "$tag" \

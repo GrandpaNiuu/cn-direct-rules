@@ -368,6 +368,19 @@ def render_outputs(rules: RuleSet) -> dict[str, str]:
         *max_provider,
         "",
     ]
+    shadowrocket_module_lines = [
+        "#!name=CN Direct Rules · Complete",
+        "#!desc=中国大陆公网独立完整直连模块；自动更新，不含局域网规则。",
+        "# Generated from https://github.com/GrandpaNiuu/cn-direct-rules",
+        "",
+        "[Rule]",
+        *max_domain_rules,
+        *ipv4_rules,
+        *ipv6_rules,
+        *asn_rules,
+        "GEOIP,CN,DIRECT",
+        "",
+    ]
 
     outputs = {
         "cn.conf": "\n".join(full_lines),
@@ -381,6 +394,7 @@ def render_outputs(rules: RuleSet) -> dict[str, str]:
         "clash/cn-max.yaml": "\n".join(clash_max_lines),
         "rule-set/cn.list": "\n".join(rule_set_lines),
         "rule-set/cn-max.list": "\n".join(max_rule_set_lines),
+        "shadowrocket/cn-direct.sgmodule": "\n".join(shadowrocket_module_lines),
     }
     hashes = {
         name: hashlib.sha256(content.encode("utf-8")).hexdigest()

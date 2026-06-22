@@ -11,6 +11,8 @@ This repository favors reproducibility and safe failure over silently publishing
 - The strict output filters known globally open suffixes; `max` outputs preserve the complete resolved TLD coverage.
 - No output contains a `GEOSITE` directive or LAN range.
 - Policy-bearing configuration fragments and policy-free provider files are generated separately.
+- The Shadowrocket Standalone Complete Module is generated from the Maximum Coverage Profile and the same verified public-network model; it is not a second hand-maintained rule source.
+- The README install button uses an HTTPS Pages bridge that accepts only the repository's exact Shadowrocket module deep link.
 - Every output is deterministic, tested, recorded in `manifest.json`, and covered by `SHA256SUMS`.
 - A failed check prevents the automated commit and Release.
 
@@ -22,6 +24,7 @@ This repository favors reproducibility and safe failure over silently publishing
 - `IP-ASN` can cover an operator's overseas addresses; clients that require purely geographic routing should use the CIDR or GeoIP subsets instead.
 - Domain-keyword rules are intentionally broad and may produce rare false positives.
 - There is no universal proxy-rule syntax. The repository provides `[Rule]` fragments, policy-free remote lists, and Clash-compatible classical providers rather than claiming one file works everywhere.
+- The Shadowrocket install deep link requires iOS/iPadOS with Shadowrocket installed. Desktop browsers can inspect the module but cannot complete the App handoff.
 - The domain archive has two GitHub endpoints but not an independent non-GitHub mirror. A GitHub-wide outage will fail closed and retain the last verified snapshot.
 
 ## Maintainer checklist
