@@ -1,0 +1,30 @@
+name: Domain rule request
+description: Propose adding or correcting a mainland-domain rule
+title: "[Domain] "
+labels:
+  - domain
+body:
+  - type: input
+    id: domain
+    attributes:
+      label: Domain
+      placeholder: example.cn
+    validations:
+      required: true
+  - type: dropdown
+    id: rule
+    attributes:
+      label: Rule type
+      options:
+        - DOMAIN
+        - DOMAIN-SUFFIX
+        - DOMAIN-KEYWORD
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Mainland ownership or routing evidence
+      description: Explain why the domain should always use DIRECT in mainland China.
+    validations:
+      required: true

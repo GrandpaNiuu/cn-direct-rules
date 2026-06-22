@@ -1,0 +1,20 @@
+name: Incorrect routing report
+description: Report an unsafe, malformed, or missing generated rule
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Include the affected client, rule, and observed behavior.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Release or commit
+      placeholder: rules-YYYYMMDD-abcdef123456
+    validations:
+      required: true

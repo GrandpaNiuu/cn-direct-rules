@@ -1,0 +1,23 @@
+{
+  "counts": {
+    "asns": 73,
+    "domain_keywords": 29,
+    "domain_suffixes": 1057,
+    "exact_domains": 2,
+    "ipv4": 5690,
+    "ipv6": 2264
+  },
+  "files": {
+    "clash/cn.yaml": "d965d79cf9852b62ef5f721647075cc187638e41f462c707f8a99f42347dd2b0",
+    "cn-domain.conf": "1031cad69090eaf00350987ee668f2b6ea308bbff5552666b455b338175adbf1",
+    "cn-ip.conf": "6c4396671a36f9c67edc7e31b27340e7d2c1585840d336c13d9111d2a22e9349",
+    "cn-ipv4.conf": "fda668b205f494fc729b944ca29545da639969f4fb88f5e3373fbd885d7c3af2",
+    "cn-ipv6.conf": "fa5b81b178b170f219945aed048c52a54450ec3ba8d9d892944208ebc85a1eb8",
+    "cn.conf": "fe184f5f45a9899dcb1a2c821482ba3b4e2026789c235376152ba1dba3d0018a"
+  },
+  "schema_version": 1,
+  "upstream": {
+    "ipv4_sha256": "38b733d6fc888df2c0d2290f099ef4dccd3c73df595a85a28ebdbf1000e2f9cc",
+    "ipv6_sha256": "e6768f1b2a0304d5ed215d981186380e62fde66aa47559edf440858c27b56c70"
+  }
+}

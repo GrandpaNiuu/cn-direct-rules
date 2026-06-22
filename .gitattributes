@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.conf text eol=lf
+*.txt text eol=lf
+*.yaml text eol=lf

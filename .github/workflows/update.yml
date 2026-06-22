@@ -1,0 +1,75 @@
+name: Update rules
+
+on:
+  schedule:
+    - cron: "17 20 * * *" # 04:17 Asia/Shanghai
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-rules
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.11"
+
+      - name: Fetch guarded upstream snapshots
+        run: python scripts/update_sources.py
+
+      - name: Build generated files
+        run: python scripts/build.py
+
+      - name: Test and validate
+        run: |
+          python -m unittest discover -s tests -v
+          python scripts/validate.py
+
+      - name: Commit verified changes
+        id: commit
+        shell: bash
+        run: |
+          if git diff --quiet -- upstream dist; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No rule changes detected."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add upstream dist
+          git commit -m "chore: update generated rules"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Publish immutable release
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          short_sha="$(git rev-parse --short=12 HEAD)"
+          tag="rules-$(date -u +%Y%m%d)-${short_sha}"
+          gh release create "$tag" \
+            dist/cn.conf \
+            dist/cn-domain.conf \
+            dist/cn-ip.conf \
+            dist/cn-ipv4.conf \
+            dist/cn-ipv6.conf \
+            dist/clash/cn.yaml \
+            dist/manifest.json \
+            --title "$tag" \
+            --notes "Automated, validated CN direct-rule update for commit $(git rev-parse HEAD)." \
+            --latest

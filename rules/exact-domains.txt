@@ -1,0 +1,2 @@
+cn.pool.ntp.org
+dns.alidns.com
