@@ -22,21 +22,33 @@
       <p id="status">若系统询问，请允许打开 App。</p>
       <div class="actions">
         <a id="install" href="#">打开 Shadowrocket</a>
-        <a id="raw" href="https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/shadowrocket/cn-direct.sgmodule">查看模块原始文件</a>
+        <a id="raw" href="#">查看原始文件</a>
       </div>
     </main>
     <script>
-      const expectedTarget = "shadowrocket://install?module=https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/shadowrocket/cn-direct.sgmodule";
+      const allowedTargets = new Map([
+        [
+          "shadowrocket://install?module=https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/shadowrocket/cn-direct.sgmodule",
+          "https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/shadowrocket/cn-direct.sgmodule",
+        ],
+        [
+          "shadowrocket://config/add/https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/shadowrocket/cn-direct.conf",
+          "https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/shadowrocket/cn-direct.conf",
+        ],
+      ]);
       const target = new URLSearchParams(window.location.search).get("url");
       const install = document.getElementById("install");
+      const raw = document.getElementById("raw");
       const status = document.getElementById("status");
 
-      if (target !== expectedTarget) {
+      if (!allowedTargets.has(target)) {
         install.removeAttribute("href");
+        raw.removeAttribute("href");
         install.setAttribute("aria-disabled", "true");
-        status.textContent = "安装地址无效；本页面只允许安装官方 CN Direct Rules 模块。";
+        status.textContent = "安装地址无效；本页面只允许安装官方 CN Direct Rules 文件。";
       } else {
         install.href = target;
+        raw.href = allowedTargets.get(target);
         window.setTimeout(() => window.location.replace(target), 150);
       }
     </script>

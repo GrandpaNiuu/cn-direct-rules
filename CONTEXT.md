@@ -24,6 +24,10 @@ _Avoid_: Version, source list
 The independently installable Shadowrocket module containing the Maximum Coverage Profile, all verified public IPv4 and IPv6 ranges, ASN rules, and the GeoIP fallback. It augments an existing configuration instead of replacing it.
 _Avoid_: Subscription, full configuration
 
+**Standalone Complete Configuration**:
+The remotely installable Shadowrocket configuration containing the Maximum Coverage Profile, all verified public IPv4 and IPv6 ranges, ASN rules, the GeoIP fallback, and a final proxy policy. It replaces the active configuration and is intended for a clean setup or reset.
+_Avoid_: Module, rule fragment
+
 **Private-network Rule**:
 A rule for LAN, CGNAT, link-local, loopback, documentation, or otherwise non-public address space. It is intentionally outside this repository.
 _Avoid_: China IP rule
