@@ -69,7 +69,7 @@ class RuleRepositoryTests(unittest.TestCase):
         self.assertIn("IP-CIDR6,", module)
         self.assertNotIn("GEOSITE,", module.upper())
 
-    def test_release_checksums_cover_every_publishable_file(self) -> None:
+    def test_checksums_cover_every_publishable_file(self) -> None:
         outputs = render_outputs(self.rules)
         checksummed = {
             line.split("  ", 1)[1]
@@ -84,11 +84,20 @@ class RuleRepositoryTests(unittest.TestCase):
         )
         self.assertIn('cron: "0 16 * * *"', workflow)
 
-    def test_release_publishes_shadowrocket_standalone_module(self) -> None:
+    def test_update_workflow_commits_without_release_or_tag(self) -> None:
         workflow = (ROOT / ".github" / "workflows" / "update.yml").read_text(
             encoding="utf-8"
         )
-        self.assertIn("dist/shadowrocket/cn-direct.sgmodule", workflow)
+        self.assertIn("git add upstream dist", workflow)
+        self.assertIn("git push", workflow)
+        for forbidden in (
+            "Publish versioned release",
+            "gh release",
+            "short_sha",
+            'tag="rules-',
+            "git tag",
+        ):
+            self.assertNotIn(forbidden, workflow)
 
     def test_readme_offers_a_safe_shadowrocket_install_button(self) -> None:
         module_url = (

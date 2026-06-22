@@ -39,11 +39,9 @@ jobs:
           python scripts/validate.py
 
       - name: Commit verified changes
-        id: commit
         shell: bash
         run: |
           if git diff --quiet -- upstream dist; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "No rule changes detected."
             exit 0
           fi
@@ -52,31 +50,3 @@ jobs:
           git add upstream dist
           git commit -m "chore: update generated rules"
           git push
-          echo "changed=true" >> "$GITHUB_OUTPUT"
-
-      - name: Publish versioned release
-        if: steps.commit.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          short_sha="$(git rev-parse --short=12 HEAD)"
-          tag="rules-$(TZ=Asia/Shanghai date +%Y%m%d)-${short_sha}"
-          gh release create "$tag" \
-            dist/cn.conf \
-            dist/cn-max.conf \
-            dist/cn-domain.conf \
-            dist/cn-max-domain.conf \
-            dist/cn-ip.conf \
-            dist/cn-ipv4.conf \
-            dist/cn-ipv6.conf \
-            dist/clash/cn.yaml \
-            dist/clash/cn-max.yaml \
-            dist/rule-set/cn.list \
-            dist/rule-set/cn-max.list \
-            dist/shadowrocket/cn-direct.sgmodule \
-            dist/manifest.json \
-            dist/SHA256SUMS \
-            --title "$tag" \
-            --notes "Automated, validated CN direct-rule update for commit $(git rev-parse HEAD)." \
-            --latest
