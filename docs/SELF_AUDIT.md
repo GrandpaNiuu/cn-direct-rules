@@ -14,7 +14,7 @@ This repository favors reproducibility and safe failure over silently publishing
 - The Shadowrocket Standalone Complete Module is generated from the Maximum Coverage Profile and the same verified public-network model; it is not a second hand-maintained rule source.
 - The README install button uses an HTTPS Pages bridge that accepts only the repository's exact Shadowrocket module deep link.
 - Every output is deterministic, tested, recorded in `manifest.json`, and covered by `SHA256SUMS`.
-- A failed check prevents the automated commit and Release.
+- A failed check prevents the automated commit and push to `main`.
 
 ## Known limits
 

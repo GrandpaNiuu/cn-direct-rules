@@ -12,9 +12,10 @@ body:
     validations:
       required: true
   - type: input
-    id: version
+    id: commit
     attributes:
-      label: Release or commit
-      placeholder: rules-YYYYMMDD-abcdef123456
+      label: Main branch commit
+      description: Paste the commit SHA for the affected `main` snapshot.
+      placeholder: cb8776a0ec07dff96d2fdd1c48d8fc4d900e3cc0
     validations:
       required: true
