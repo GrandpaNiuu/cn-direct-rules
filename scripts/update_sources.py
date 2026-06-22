@@ -97,12 +97,12 @@ def normalize_candidate(text: str, version: int, minimum: int, maximum: int) -> 
         for line in text.splitlines()
         if line.strip() and not line.lstrip().startswith("#")
     ]
-    networks = tuple(
-        sorted(
-            (ipaddress.ip_network(value, strict=True) for value in raw_values),
-            key=network_sort_key,
-        )
-    )
+    parsed = tuple(ipaddress.ip_network(value, strict=True) for value in raw_values)
+    if any(network.version != version for network in parsed):
+        raise ValueError(f"IPv{version} source contains a network from another address family")
+    # Collapsing preserves the exact address union while safely repairing upstream
+    # duplicates, overlaps, and adjacent ranges before validation and publication.
+    networks = tuple(sorted(ipaddress.collapse_addresses(parsed), key=network_sort_key))
     errors = validate_networks(networks, version)
     if not minimum <= len(networks) <= maximum:
         errors.append(

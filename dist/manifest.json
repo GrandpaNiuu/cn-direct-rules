@@ -28,6 +28,7 @@
     "cn.conf": "e00db5e86f805db7f68c12a1008107f2a7d95d9d00b113bb5bd257b1a0fa289c",
     "rule-set/cn-max.list": "40d8cf5323fdc6bc025428cff9952c166bd20608851f569886dd24a53c01a366",
     "rule-set/cn.list": "c6f860edff7a5b78ba8abd7061f0a9e1dff26ba0858bc700180387456655a197",
+    "shadowrocket/cn-direct.conf": "9088724869474311502eda0ef2e7520cdacb3fae5fad73abb9b2b0bb13abad60",
     "shadowrocket/cn-direct.sgmodule": "0c60637352af66f5d1aee563baf836e41e24b96d68501b440a35647876f688ef"
   },
   "schema_version": 1,

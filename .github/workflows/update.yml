@@ -28,7 +28,17 @@ jobs:
           python-version: "3.11"
 
       - name: Fetch guarded upstream snapshots
+        id: sources
+        continue-on-error: true
         run: python scripts/update_sources.py
+
+      - name: Keep last verified snapshots when upstream refresh fails
+        if: steps.sources.outcome == 'failure'
+        shell: bash
+        run: |
+          echo "::warning::Upstream refresh failed. Keeping the last verified snapshots and retrying on the next run."
+          echo "## Upstream refresh warning" >> "$GITHUB_STEP_SUMMARY"
+          echo "The upstream refresh failed, so this run kept the last verified snapshots. Build and validation still run below." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build generated files
         run: python scripts/build.py

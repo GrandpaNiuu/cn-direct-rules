@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import ipaddress
-import re
 import tempfile
 import unittest
 from dataclasses import replace
@@ -69,6 +68,30 @@ class RuleRepositoryTests(unittest.TestCase):
         self.assertIn("IP-CIDR6,", module)
         self.assertNotIn("GEOSITE,", module.upper())
 
+    def test_shadowrocket_standalone_configuration_is_complete(self) -> None:
+        config = render_outputs(self.rules)["shadowrocket/cn-direct.conf"]
+        rule_lines = config.split("[Rule]\n", 1)[1].splitlines()
+        rule_lines = [line for line in rule_lines if line and not line.startswith("#")]
+        expected_rule_count = (
+            len(self.rules.max_exact_domains)
+            + len(self.rules.max_domain_suffixes)
+            + len(self.rules.max_domain_keywords)
+            + len(self.rules.ipv4)
+            + len(self.rules.ipv6)
+            + len(self.rules.asns)
+            + 2
+        )
+        self.assertIn("[General]\n", config)
+        self.assertIn("dns-server = system", config)
+        self.assertIn("ipv6 = true", config)
+        self.assertIn("\n[Rule]\n", config)
+        self.assertEqual(expected_rule_count, len(rule_lines))
+        self.assertEqual(1, config.count("DOMAIN-SUFFIX,cn,DIRECT"))
+        self.assertEqual(1, config.count("GEOIP,CN,DIRECT"))
+        self.assertIn("IP-CIDR6,", config)
+        self.assertTrue(config.endswith("FINAL,PROXY\n"))
+        self.assertNotIn("GEOSITE,", config.upper())
+
     def test_checksums_cover_every_publishable_file(self) -> None:
         outputs = render_outputs(self.rules)
         checksummed = {
@@ -99,7 +122,7 @@ class RuleRepositoryTests(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, workflow)
 
-    def test_readme_offers_a_safe_shadowrocket_install_button(self) -> None:
+    def test_readme_offers_module_and_configuration_install_buttons(self) -> None:
         module_url = (
             "https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/"
             "main/dist/shadowrocket/cn-direct.sgmodule"
@@ -109,18 +132,27 @@ class RuleRepositoryTests(unittest.TestCase):
             "https://grandpaniuu.github.io/cn-direct-rules/redirect.html?url="
             + quote(target, safe="")
         )
-        readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        self.assertRegex(
-            readme,
-            re.escape(f"]({redirect_url} ") + r'"一键安装独立完整模块"\)',
+        config_url = (
+            "https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/"
+            "main/dist/shadowrocket/cn-direct.conf"
         )
+        config_target = f"shadowrocket://config/add/{config_url}"
+        config_redirect_url = (
+            "https://grandpaniuu.github.io/cn-direct-rules/redirect.html?url="
+            + quote(config_target, safe="")
+        )
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn(redirect_url, readme)
+        self.assertIn(config_redirect_url, readme)
 
         page = (ROOT / "docs" / "redirect.html").read_text(encoding="utf-8")
         self.assertIn(target, page)
-        self.assertIn("target !== expectedTarget", page)
+        self.assertIn(config_target, page)
         parsed = urlparse(redirect_url)
         self.assertEqual("https", parsed.scheme)
         self.assertEqual(target, parse_qs(parsed.query)["url"][0])
+        config_parsed = urlparse(config_redirect_url)
+        self.assertEqual(config_target, parse_qs(config_parsed.query)["url"][0])
 
     def test_pages_workflow_publishes_the_install_redirect(self) -> None:
         workflow = (ROOT / ".github" / "workflows" / "pages.yml").read_text(
@@ -140,6 +172,26 @@ class RuleRepositoryTests(unittest.TestCase):
     def test_source_drift_is_rejected(self) -> None:
         with self.assertRaisesRegex(ValueError, "outside"):
             normalize_candidate("1.0.1.0/24\n", 4, 5000, 7000)
+
+    def test_source_normalizer_repairs_duplicate_and_overlapping_cidrs(self) -> None:
+        normalized = normalize_candidate(
+            "1.0.1.0/24\n1.0.1.0/25\n1.0.1.128/25\n1.0.1.0/24\n",
+            4,
+            1,
+            2,
+        )
+        self.assertEqual("1.0.1.0/24\n", normalized)
+
+    def test_upstream_failure_keeps_last_verified_snapshot(self) -> None:
+        workflow = (ROOT / ".github" / "workflows" / "update.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("id: sources", workflow)
+        self.assertIn("continue-on-error: true", workflow)
+        self.assertIn("steps.sources.outcome == 'failure'", workflow)
+        self.assertIn("last verified", workflow.lower())
+        self.assertIn("python scripts/build.py", workflow)
+        self.assertIn("python scripts/validate.py", workflow)
 
     @patch("scripts.update_sources.download")
     def test_source_download_falls_back_to_second_mirror(self, mocked_download) -> None:
