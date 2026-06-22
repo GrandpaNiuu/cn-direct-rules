@@ -25,6 +25,18 @@ def main() -> None:
         if actual != expected_content:
             errors.append(f"stale or modified generated file: dist/{relative_name}")
 
+    actual_files = {
+        path.relative_to(ROOT / "dist").as_posix()
+        for path in (ROOT / "dist").rglob("*")
+        if path.is_file()
+    }
+    unexpected_files = sorted(actual_files - set(expected))
+    if unexpected_files:
+        errors.append(
+            "unexpected generated files: "
+            + ", ".join(f"dist/{name}" for name in unexpected_files)
+        )
+
     all_generated = "\n".join(expected.values()).upper()
     if "GEOSITE," in all_generated:
         errors.append("generated output must not contain GEOSITE")
@@ -32,14 +44,34 @@ def main() -> None:
         errors.append("generated cn.conf is missing DOMAIN-SUFFIX,cn,DIRECT")
     if expected["cn.conf"].upper().count("GEOIP,CN,DIRECT") != 1:
         errors.append("generated cn.conf must contain GEOIP,CN,DIRECT exactly once")
-    if ",DIRECT" in expected["clash/cn.yaml"]:
-        errors.append("Clash provider must not embed a policy")
+    if expected["cn-max.conf"].upper().count("GEOIP,CN,DIRECT") != 1:
+        errors.append("generated cn-max.conf must contain GEOIP,CN,DIRECT exactly once")
+    for relative_name in (
+        "clash/cn.yaml",
+        "clash/cn-max.yaml",
+        "rule-set/cn.list",
+        "rule-set/cn-max.list",
+    ):
+        if ",DIRECT" in expected[relative_name]:
+            errors.append(f"policy-free provider embeds a policy: {relative_name}")
 
     manifest = json.loads(expected["manifest.json"])
     for relative_name, expected_hash in manifest["files"].items():
         actual_hash = hashlib.sha256(expected[relative_name].encode("utf-8")).hexdigest()
         if actual_hash != expected_hash:
             errors.append(f"manifest hash mismatch for {relative_name}")
+
+    checksums = {
+        relative_name: digest
+        for line in expected["SHA256SUMS"].splitlines()
+        for digest, relative_name in (line.split("  ", 1),)
+    }
+    for relative_name, content in expected.items():
+        if relative_name == "SHA256SUMS":
+            continue
+        actual_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
+        if checksums.get(relative_name) != actual_hash:
+            errors.append(f"SHA256SUMS mismatch for {relative_name}")
 
     if errors:
         raise SystemExit("Validation failed:\n- " + "\n- ".join(errors))
@@ -48,6 +80,7 @@ def main() -> None:
         f"{len(rules.exact_domains)} exact domains, "
         f"{len(rules.domain_suffixes)} suffixes, "
         f"{len(rules.domain_keywords)} keywords, "
+        f"{len(rules.max_domain_suffixes)} max suffixes, "
         f"{len(rules.ipv4)} IPv4, {len(rules.ipv6)} IPv6, {len(rules.asns)} ASNs"
     )
 
