@@ -225,6 +225,17 @@ def validate_rules(rules: RuleSet, root: Path = ROOT) -> list[str]:
     unsafe = sorted(forbidden.intersection(rules.domain_suffixes))
     if unsafe:
         errors.append(f"unsafe global suffixes cannot be routed wholesale: {', '.join(unsafe)}")
+    high_risk = set(read_values(root / "config" / "high-risk-domain-suffixes.txt"))
+    risky = sorted(
+        value
+        for value in rules.max_domain_suffixes
+        if any(value == root_suffix or value.endswith("." + root_suffix) for root_suffix in high_risk)
+    )
+    if risky:
+        errors.append(
+            "high-risk foreign-platform suffixes cannot be routed in canonical outputs: "
+            + ", ".join(risky[:20])
+        )
     if not set(rules.domain_suffixes).issubset(rules.max_domain_suffixes):
         errors.append("max domain suffixes must contain every strict suffix")
 

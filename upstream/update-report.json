@@ -1,12 +1,12 @@
 {
   "aggregate_counts": {
     "asns": 5243,
-    "exact": 63,
+    "exact": 5,
     "ipv4": 5781,
     "ipv6": 2264,
     "keywords": 29,
     "skipped_regexes": 3,
-    "suffixes": 114788
+    "suffixes": 112472
   },
   "all_sources_refreshed": true,
   "category_observation_advanced": {
@@ -15,25 +15,36 @@
     "domain-keywords": false,
     "domain-suffixes": false
   },
+  "excluded_from_aggregate": [
+    "felixonmars-google-cn"
+  ],
   "lifecycle": {
     "asns": {
       "added": 0,
+      "removed_excluded_source": 0,
       "retained_missing": 18,
       "retired": 0
     },
     "domain-exact": {
       "added": 0,
-      "retained_missing": 58,
+      "removed_excluded_source": 0,
+      "removed_high_risk": 0,
+      "repaired_redundant": 0,
+      "retained_missing": 0,
       "retired": 0
     },
     "domain-keywords": {
       "added": 0,
+      "removed_excluded_source": 0,
       "retained_missing": 29,
       "retired": 0
     },
     "domain-suffixes": {
-      "added": 0,
-      "retained_missing": 2325,
+      "added": 1,
+      "removed_excluded_source": 0,
+      "removed_high_risk": 0,
+      "repaired_redundant": 1,
+      "retained_missing": 121,
       "retired": 0
     }
   },

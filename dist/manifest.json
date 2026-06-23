@@ -3,14 +3,14 @@
     "asns": 5243,
     "domains": {
       "max": {
-        "exact": 63,
+        "exact": 5,
         "keywords": 29,
-        "suffixes": 114788
+        "suffixes": 112472
       },
       "strict": {
-        "exact": 63,
+        "exact": 5,
         "keywords": 29,
-        "suffixes": 114772
+        "suffixes": 112456
       }
     },
     "ipv4": 5781,
@@ -29,29 +29,29 @@
   },
   "data_license": "https://github.com/GrandpaNiuu/cn-direct-rules/blob/main/DATA_LICENSE.md",
   "files": {
-    "clash/cn-max.yaml": "c2396fa1ad0b1ee115305a945efa3f767488e5964bed053146627526e504df75",
-    "clash/cn.yaml": "16074bd0405769a57bdaec400d068a0d6c1f618d91624a058be71e7450104ede",
-    "cn-domain.conf": "ee8d58add91a43dd6357843fd445a828d1101769fc1532bb9e7433fc1ab88ec6",
+    "clash/cn-max.yaml": "2e138344522485878105f662f9d4a30f54767bdf857d8474d2b082563bb807cd",
+    "clash/cn.yaml": "34d6a6d1727084ef9f4b91d19aee77d2b9f74b49fc6e373329ef97f67f194aac",
+    "cn-domain.conf": "a02807f2481a73846943ccba2038efb18cee43a7ea6efa002bca1e565178f545",
     "cn-ip.conf": "db9e7ef076f27576fc880ee71dd333d7815a509c0d3ee4d4c84643cda6b21470",
     "cn-ipv4.conf": "8cea73e3f01c79c63305bf07ec5dd281de958b68c59c02dd511919eb4d1b0a9c",
     "cn-ipv6.conf": "df58e332edce9169f5f08678e7a2fcbb606fbc191bae18c0838f14692997615d",
-    "cn-max-domain.conf": "3e84547b354d409ec5eb5da50328c22eee76f23054de5b7b3782372c8043faef",
-    "cn-max.conf": "1aee9ec147a0cdcebb8c3e78a0966035a3b5e908fba940c8ab77b31eec43ff07",
-    "cn.conf": "e62addbd7712e705470d719bd71da3aeb0d7239844398a09cc958b1f392f87a5",
+    "cn-max-domain.conf": "0c0c6fd0569d7d3dd119cb06144ffe3058cc287b8a3ffff1ba6ae32b796a3830",
+    "cn-max.conf": "f122a2d41976387c58e8d1980e389d71ec4c67eddb08e74c3762fcb61d2dfb25",
+    "cn.conf": "417507006f73da794b482055e251714f2545c47db7876e8c58aed449e4e09b41",
     "operators/cernet.conf": "9904de15b3781ad4f30e92c92c37c37c20a1812329267764e3588891530e7fd9",
     "operators/chinanet.conf": "66f82e91715c366cf6740d9aa5bf1de74159e136a463b50f5b67d05be2ebe57a",
     "operators/cmcc.conf": "28e6be5a0571c99905035b21ae89f7f170660170f7e3bbb5375c0d6144bd4389",
     "operators/cstnet.conf": "eb4f8b156b198657d17c664f88f7568dd9998c2cbd40c921a7e17d200b4e15b6",
     "operators/unicom.conf": "90207b1b32a7a60c8ba8e76db73caf0bc04d8bc0d1f2d1e9dedb0e1e0f333b88",
     "registry/cn-allocated.conf": "6cca49165b8aa1e5f4592924ad5dfb23a9daa2bd8c106c09a20d296cc82fdab5",
-    "rule-set/cn-max.list": "0e4222182ce91d84a8150d1c2dbdefaac41e76b497f7dbd10f970cc83f4d10cb",
-    "rule-set/cn.list": "7ba10db2ba65a70589b42a95a60f865492816ebb2bc3755468995e26960508c6",
-    "shadowrocket/cn-direct.conf": "a65d9fd0073d69879a7d594c2640ad0aa4cbea0bbde58640c346e43fc164d16f",
-    "shadowrocket/cn-direct.sgmodule": "e01dce427507ec1cdf3bbd14bfdc7dda852b97f3804b27ec0b70e74744f8b8e2"
+    "rule-set/cn-max.list": "2c3cfd855c86df3ac3ed3555686fe214ac834c0debbd4bf04f71bbabdfcfdde6",
+    "rule-set/cn.list": "6896704e760037c56930b0b8875d510d8f388c82261cca5101a68c2c3e8beea5",
+    "shadowrocket/cn-direct.conf": "7877d486bb1b4363c133fad083f390fdfc26301765f3b20186ecf742fbc77579",
+    "shadowrocket/cn-direct.sgmodule": "7ebae02e263f3bad8e26d688660b6eb24bff60497e15292a4004cdd9664391aa"
   },
   "schema_version": 1,
   "upstream": {
-    "domains_sha256": "7ff752d36d6c2f5418d4a31993e1b7e9829ecd35c965ac7fbf8d8bd44a3f96f2",
+    "domains_sha256": "82a471f5f57338566e3f8ae8924cf5c8e651fedb831826a5b73c8c5cfb1a8511",
     "ipv4_sha256": "32161d1af7840c713dbcfa067bf63ee6aa59353c8971aa176620f1765a27e0a7",
     "ipv6_sha256": "e6768f1b2a0304d5ed215d981186380e62fde66aa47559edf440858c27b56c70",
     "skipped_domain_regexes": 3

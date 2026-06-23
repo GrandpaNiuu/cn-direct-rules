@@ -8,7 +8,7 @@ That project states that its source data comes from BGP/ASN and APNIC and distri
 
 The normalized files `upstream/domain-*.txt` are derived from the `cn` list in <https://github.com/v2fly/domain-list-community>, distributed under the MIT License. Unsupported regular-expression entries are counted in `upstream/domain-metadata.json` but are not emitted because the target clients do not share one portable regex syntax. See [`third_party/LICENSE-domain-list-community.txt`](third_party/LICENSE-domain-list-community.txt).
 
-The high-coverage, Apple China, and Google China domain suffix snapshots are derived from <https://github.com/felixonmars/dnsmasq-china-list>, distributed under the WTFPL Version 2. Only active `server=/domain/resolver` records are parsed; commented-out removals are ignored. See [`third_party/LICENSE-dnsmasq-china-list.txt`](third_party/LICENSE-dnsmasq-china-list.txt).
+The high-coverage, Apple China, and Google China domain suffix snapshots are derived from <https://github.com/felixonmars/dnsmasq-china-list>, distributed under the WTFPL Version 2. Only active `server=/domain/resolver` records are parsed; commented-out removals are ignored. Google China is retained as an audit-only source snapshot and is excluded from canonical generated rules and client artifacts. See [`third_party/LICENSE-dnsmasq-china-list.txt`](third_party/LICENSE-dnsmasq-china-list.txt).
 
 The independent BGP/operator IPv4 and IPv6 snapshots are derived from <https://github.com/gaoyifan/china-operator-ip>, distributed under the MIT License. See [`third_party/LICENSE-china-operator-ip.txt`](third_party/LICENSE-china-operator-ip.txt).
 

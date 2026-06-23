@@ -9,7 +9,9 @@ This repository favors traceable data, safe failure, and reproducible output ove
 - Sources refresh independently. A failed source reuses only its own last verified snapshot, while healthy sources may continue updating.
 - IPv4 and IPv6 use independent APNIC/BGP-derived projects. The hourly chnroutes2 feed closes additional IPv4 routing gaps. Duplicate, overlapping, and adjacent ranges are collapsed without changing their address union.
 - APNIC delegated statistics are parsed independently, checked for recency, and compared with routed coverage. A registry gap greater than 0.5% rejects the refresh.
-- Domain coverage combines V2Fly's structured `cn` data with felixonmars' actively maintained mainland DNS-routing, Apple China, and Google China lists. Commented-out dnsmasq entries are treated as removed and never imported.
+- Domain coverage combines V2Fly's structured `cn` data with felixonmars' actively maintained mainland DNS-routing and Apple China lists. Google China and similar high-risk platform snapshots may be refreshed for audit, but they are marked non-aggregate and cannot enter canonical outputs.
+- Non-aggregate source values and high-risk foreign-platform suffixes are removed from canonical domain outputs immediately rather than waiting for the three-observation retirement window.
+- Domain outputs are automatically repaired so redundant child suffixes and exact domains covered by a parent suffix are removed during every update.
 - Operator slices for China Telecom, China Mobile, China Unicom, CERNET, and CSTNET are generated independently from BGP classifications and are not silently merged into the canonical model.
 - ASN data is parsed only from explicit `IP-ASN,<number>` records in the daily ASN-China snapshot.
 - A disappeared domain or ASN remains for three Beijing-calendar-day observations on which every source relevant to that category refreshed successfully. Re-running the updater on the same day or a relevant-source failure does not age it toward deletion.
@@ -24,7 +26,7 @@ This repository favors traceable data, safe failure, and reproducible output ove
 
 The project does not delete a domain merely because one machine cannot open it. DNS failures, regional CDN behavior, temporary maintenance, and blocking can all make active services look dead. Large-scale probing would also be noisy and unreliable.
 
-Instead, a rule becomes eligible for removal only after all relevant successful source snapshots stop reporting it on three distinct Beijing calendar days. Source download failures do not count. The update report records additions, retained missing rules, and retirements.
+Instead, a normal rule becomes eligible for removal only after all relevant successful source snapshots stop reporting it on three distinct Beijing calendar days. Source download failures do not count. Non-aggregate source leftovers, high-risk platform domains, and parent-covered domain duplicates are repaired immediately. The update report records additions, retained missing rules, retirements, excluded-source removals, high-risk removals, and redundancy repairs.
 
 ## Known limits
 

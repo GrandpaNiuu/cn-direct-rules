@@ -67,6 +67,7 @@
       "min_entries": 75,
       "max_entries": 250,
       "max_bytes": 100000,
+      "contributes_to_aggregate": false,
       "license": "WTFPL-2.0",
       "project": "https://github.com/felixonmars/dnsmasq-china-list"
     },

@@ -20,6 +20,8 @@ from scripts.update_sources import (
     parse_asn_list,
     parse_dnsmasq_domains,
     parse_rir_allocations,
+    remove_high_risk_domain_rules,
+    repair_domain_redundancy,
     registry_coverage,
     reconcile_values,
     resolve_domain_files,
@@ -64,6 +66,22 @@ class RuleRepositoryTests(unittest.TestCase):
         self.assertGreaterEqual(
             len(self.rules.max_domain_suffixes), len(self.rules.domain_suffixes)
         )
+
+    def test_high_risk_foreign_platform_domains_are_not_in_canonical_outputs(self) -> None:
+        high_risk = set(
+            value
+            for value in (ROOT / "config" / "high-risk-domain-suffixes.txt")
+            .read_text(encoding="utf-8")
+            .splitlines()
+            if value and not value.startswith("#")
+        )
+        canonical = set(self.rules.max_domain_suffixes)
+        slipped = sorted(
+            value
+            for value in canonical
+            if any(value == risk or value.endswith("." + risk) for risk in high_risk)
+        )
+        self.assertEqual([], slipped)
         self.assertTrue(
             set(self.rules.domain_suffixes).issubset(self.rules.max_domain_suffixes)
         )
@@ -335,6 +353,41 @@ class RuleRepositoryTests(unittest.TestCase):
         self.assertEqual({"missing.example": 1}, result.missing_counts)
         self.assertIn("missing.example", result.values)
 
+    def test_redundant_domain_rules_are_repaired_without_waiting_for_retirement(self) -> None:
+        repaired = repair_domain_redundancy(
+            exact=("literal.net", "www.safe.com"),
+            suffixes=("cn", "example.cn", "api.safe.com", "safe.com"),
+            missing_counts={
+                "domain-exact": {"www.safe.com": 1},
+                "domain-suffixes": {"example.cn": 1, "api.safe.com": 1},
+            },
+        )
+        self.assertEqual(("literal.net",), repaired.exact)
+        self.assertEqual(("cn", "safe.com"), repaired.suffixes)
+        self.assertEqual(
+            {"domain-exact": {}, "domain-suffixes": {}}, repaired.missing_counts
+        )
+
+    def test_high_risk_domain_rules_are_removed_without_waiting_for_retirement(self) -> None:
+        repaired = remove_high_risk_domain_rules(
+            exact=("api.google.com", "safe.example"),
+            suffixes=("fonts.gstatic.com", "safe.example"),
+            high_risk_suffixes={"google.com", "gstatic.com"},
+            missing_counts={
+                "domain-exact": {"api.google.com": 1, "safe.example": 1},
+                "domain-suffixes": {"fonts.gstatic.com": 1, "safe.example": 1},
+            },
+        )
+        self.assertEqual(("safe.example",), repaired.exact)
+        self.assertEqual(("safe.example",), repaired.suffixes)
+        self.assertEqual(
+            {
+                "domain-exact": {"safe.example": 1},
+                "domain-suffixes": {"safe.example": 1},
+            },
+            repaired.missing_counts,
+        )
+
     def test_only_a_relevant_source_failure_stops_category_retirement(self) -> None:
         sources = [
             {"id": "domains", "categories": ["domain-suffixes"]},
@@ -353,6 +406,28 @@ class RuleRepositoryTests(unittest.TestCase):
             can_advance_category(
                 sources,
                 {"domains": "retained after refresh failure", "operator": "refreshed"},
+                "domain-suffixes",
+                "2026-06-22",
+                "2026-06-23",
+            )
+        )
+
+    def test_audit_only_source_failure_does_not_stop_category_retirement(self) -> None:
+        sources = [
+            {"id": "domains", "categories": ["domain-suffixes"]},
+            {
+                "id": "audit-only",
+                "categories": ["domain-suffixes"],
+                "contributes_to_aggregate": False,
+            },
+        ]
+        self.assertTrue(
+            can_advance_category(
+                sources,
+                {
+                    "domains": "refreshed",
+                    "audit-only": "retained after refresh failure",
+                },
                 "domain-suffixes",
                 "2026-06-22",
                 "2026-06-23",

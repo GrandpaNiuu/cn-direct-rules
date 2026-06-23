@@ -1,0 +1,10 @@
+2mdn.net
+doubleclick.net
+gmail.com
+google-analytics.com
+google.com
+googleadservices.com
+googleapis.com
+googlesyndication.com
+gstatic.com
+youtube.com

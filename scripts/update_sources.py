@@ -19,7 +19,7 @@ from zoneinfo import ZoneInfo
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.ruleset import ROOT, network_sort_key, validate_networks
+from scripts.ruleset import ROOT, network_sort_key, read_values, validate_networks
 
 
 USER_AGENT = "GrandpaNiuu/cn-direct-rules source updater"
@@ -145,6 +145,108 @@ class ReconcileResult:
     retired: tuple[str, ...]
 
 
+@dataclass(frozen=True)
+class DomainRepairResult:
+    exact: tuple[str, ...]
+    suffixes: tuple[str, ...]
+    missing_counts: dict[str, dict[str, int]]
+
+
+def _has_covering_suffix(value: str, suffixes: set[str], *, include_self: bool) -> bool:
+    labels = value.split(".")
+    start = 0 if include_self else 1
+    return any(".".join(labels[index:]) in suffixes for index in range(start, len(labels)))
+
+
+def _matches_domain_suffix(value: str, suffixes: set[str]) -> bool:
+    return any(value == suffix or value.endswith("." + suffix) for suffix in suffixes)
+
+
+def remove_high_risk_domain_rules(
+    exact: tuple[str, ...],
+    suffixes: tuple[str, ...],
+    high_risk_suffixes: set[str],
+    missing_counts: dict[str, dict[str, int]],
+) -> DomainRepairResult:
+    safe_exact = tuple(
+        sorted(
+            (value for value in set(exact) if not _matches_domain_suffix(value, high_risk_suffixes)),
+            key=str.casefold,
+        )
+    )
+    safe_suffixes = tuple(
+        sorted(
+            (
+                value
+                for value in set(suffixes)
+                if not _matches_domain_suffix(value, high_risk_suffixes)
+            ),
+            key=str.casefold,
+        )
+    )
+    return DomainRepairResult(
+        safe_exact,
+        safe_suffixes,
+        {
+            "domain-exact": {
+                value: count
+                for value, count in missing_counts.get("domain-exact", {}).items()
+                if value in safe_exact
+            },
+            "domain-suffixes": {
+                value: count
+                for value, count in missing_counts.get("domain-suffixes", {}).items()
+                if value in safe_suffixes
+            },
+        },
+    )
+
+
+def repair_domain_redundancy(
+    exact: tuple[str, ...],
+    suffixes: tuple[str, ...],
+    missing_counts: dict[str, dict[str, int]],
+) -> DomainRepairResult:
+    suffix_set = set(suffixes)
+    repaired_suffixes = tuple(
+        sorted(
+            (
+                value
+                for value in suffix_set
+                if not _has_covering_suffix(value, suffix_set, include_self=False)
+            ),
+            key=str.casefold,
+        )
+    )
+    repaired_suffix_set = set(repaired_suffixes)
+    repaired_exact = tuple(
+        sorted(
+            (
+                value
+                for value in set(exact)
+                if not _has_covering_suffix(value, repaired_suffix_set, include_self=True)
+            ),
+            key=str.casefold,
+        )
+    )
+    return DomainRepairResult(
+        repaired_exact,
+        repaired_suffixes,
+        {
+            "domain-exact": {
+                value: count
+                for value, count in missing_counts.get("domain-exact", {}).items()
+                if value in repaired_exact
+            },
+            "domain-suffixes": {
+                value: count
+                for value, count in missing_counts.get("domain-suffixes", {}).items()
+                if value in repaired_suffixes
+            },
+        },
+    )
+
+
 def reconcile_values(
     previous: tuple[str, ...],
     observed: tuple[str, ...],
@@ -195,7 +297,8 @@ def can_advance_category(
     relevant_source_ids = {
         source["id"]
         for source in sources
-        if category in source.get("categories", [source.get("category")])
+        if source.get("contributes_to_aggregate", True) is not False
+        and category in source.get("categories", [source.get("category")])
     }
     return bool(relevant_source_ids) and all(
         statuses.get(source_id) == "refreshed" for source_id in relevant_source_ids
@@ -666,9 +769,16 @@ def update(root: Path = ROOT) -> list[Path]:
         source_metadata[source["id"]] = metadata
 
     unions: dict[str, set[str]] = {}
-    for values in snapshots.values():
+    excluded_unions: dict[str, set[str]] = {}
+    for source in config["sources"]:
+        values = snapshots[source["id"]]
+        target = (
+            excluded_unions
+            if source.get("contributes_to_aggregate", True) is False
+            else unions
+        )
         for category, items in values.items():
-            unions.setdefault(category, set()).update(items)
+            target.setdefault(category, set()).update(items)
 
     observed = {
         "domain-exact": tuple(sorted(unions.get("domain-exact", set()), key=str.casefold)),
@@ -794,6 +904,78 @@ def update(root: Path = ROOT) -> list[Path]:
             result.values, numeric=(category == "asns")
         )
 
+    for category, filename in aggregate_names.items():
+        excluded_values = excluded_unions.get(category, set()) - set(observed[category])
+        if not excluded_values:
+            lifecycle_report[category]["removed_excluded_source"] = 0
+            continue
+        aggregate_path = root / "upstream" / filename
+        before_excluded_repair = tuple(candidates[aggregate_path].splitlines())
+        repaired_values = tuple(
+            value for value in before_excluded_repair if value not in excluded_values
+        )
+        candidates[aggregate_path] = _text(
+            repaired_values, numeric=(category == "asns")
+        )
+        repaired_value_set = set(repaired_values)
+        next_missing[category] = {
+            value: count
+            for value, count in next_missing.get(category, {}).items()
+            if value in repaired_value_set
+        }
+        lifecycle_report[category]["retained_missing"] = len(next_missing[category])
+        lifecycle_report[category]["removed_excluded_source"] = (
+            len(before_excluded_repair) - len(repaired_values)
+        )
+
+    exact_path = root / "upstream" / "domain-exact.txt"
+    suffix_path = root / "upstream" / "domain-suffixes.txt"
+    high_risk_suffixes = set(read_values(root / "config" / "high-risk-domain-suffixes.txt"))
+    before_safety_exact = tuple(candidates[exact_path].splitlines())
+    before_safety_suffixes = tuple(candidates[suffix_path].splitlines())
+    safety_repair = remove_high_risk_domain_rules(
+        exact=before_safety_exact,
+        suffixes=before_safety_suffixes,
+        high_risk_suffixes=high_risk_suffixes,
+        missing_counts={
+            "domain-exact": next_missing.get("domain-exact", {}),
+            "domain-suffixes": next_missing.get("domain-suffixes", {}),
+        },
+    )
+    candidates[exact_path] = _text(safety_repair.exact)
+    candidates[suffix_path] = _text(safety_repair.suffixes)
+    next_missing["domain-exact"] = safety_repair.missing_counts["domain-exact"]
+    next_missing["domain-suffixes"] = safety_repair.missing_counts["domain-suffixes"]
+    lifecycle_report["domain-exact"]["removed_high_risk"] = (
+        len(before_safety_exact) - len(safety_repair.exact)
+    )
+    lifecycle_report["domain-suffixes"]["removed_high_risk"] = (
+        len(before_safety_suffixes) - len(safety_repair.suffixes)
+    )
+
+    before_repair_exact = safety_repair.exact
+    before_repair_suffixes = safety_repair.suffixes
+    domain_repair = repair_domain_redundancy(
+        exact=before_repair_exact,
+        suffixes=before_repair_suffixes,
+        missing_counts={
+            "domain-exact": next_missing.get("domain-exact", {}),
+            "domain-suffixes": next_missing.get("domain-suffixes", {}),
+        },
+    )
+    exact_repaired_count = len(before_repair_exact) - len(domain_repair.exact)
+    suffix_repaired_count = len(before_repair_suffixes) - len(domain_repair.suffixes)
+    candidates[exact_path] = _text(domain_repair.exact)
+    candidates[suffix_path] = _text(domain_repair.suffixes)
+    next_missing["domain-exact"] = domain_repair.missing_counts["domain-exact"]
+    next_missing["domain-suffixes"] = domain_repair.missing_counts["domain-suffixes"]
+    lifecycle_report["domain-exact"]["retained_missing"] = len(next_missing["domain-exact"])
+    lifecycle_report["domain-suffixes"]["retained_missing"] = len(
+        next_missing["domain-suffixes"]
+    )
+    lifecycle_report["domain-exact"]["repaired_redundant"] = exact_repaired_count
+    lifecycle_report["domain-suffixes"]["repaired_redundant"] = suffix_repaired_count
+
     candidates[lifecycle_path] = json.dumps(
         {
             "schema_version": 3,
@@ -833,6 +1015,11 @@ def update(root: Path = ROOT) -> list[Path]:
             "registry_coverage": registry_audit,
             "all_sources_refreshed": all_sources_refreshed,
             "category_observation_advanced": category_advancement,
+            "excluded_from_aggregate": [
+                source["id"]
+                for source in config["sources"]
+                if source.get("contributes_to_aggregate", True) is False
+            ],
             "observation_advanced": any(category_advancement.values()),
             "sources": statuses,
         },
