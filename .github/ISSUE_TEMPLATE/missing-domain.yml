@@ -1,0 +1,45 @@
+name: Missing direct-route rule
+description: Report a mainland China domain, IP range, or ASN that should probably be direct-routed but is missing.
+title: "missing: "
+labels:
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for suspected false negatives. Do not submit private, LAN, CGNAT, loopback, or link-local addresses.
+  - type: input
+    id: target
+    attributes:
+      label: Missing target
+      description: Domain, domain suffix, CIDR, or ASN.
+      placeholder: example.cn / 1.2.3.0/24 / AS4134
+    validations:
+      required: true
+  - type: dropdown
+    id: target_type
+    attributes:
+      label: Target type
+      options:
+        - domain
+        - domain suffix
+        - IPv4 CIDR
+        - IPv6 CIDR
+        - ASN
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Provide public evidence such as official site, DNS answer, traceroute, BGP/WHOIS/RPKI/PeeringDB reference, or upstream list reference.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Explain what breaks or routes incorrectly without this rule.
+    validations:
+      required: false
