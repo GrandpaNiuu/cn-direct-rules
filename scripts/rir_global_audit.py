@@ -4,11 +4,15 @@ import argparse
 import hashlib
 import ipaddress
 import json
+import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts.ruleset import ROOT, network_sort_key, read_values, validate_networks
 
