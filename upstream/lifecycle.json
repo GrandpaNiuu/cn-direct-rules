@@ -177,7 +177,7 @@
     }
   },
   "observation_day": "2026-06-23",
-  "observation_id": "b04d4badc77aaa181386926a042c7220c51558b322eb3032a257c4a60a991da3",
+  "observation_id": "2a8784fe1262689f343dc58ba5a42ee0c16ae84705c1995b6897f998ce85d535",
   "policy": {
     "max_retire_count": 1000,
     "max_retire_ratio": 0.01,
