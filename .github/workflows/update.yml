@@ -15,7 +15,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - name: Check out repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -40,8 +40,11 @@ jobs:
           echo "## Upstream refresh warning" >> "$GITHUB_STEP_SUMMARY"
           echo "The upstream refresh failed, so this run kept the last verified snapshots. Build and validation still run below." >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Refresh automated audit reports
+      - name: Refresh automated RIR audit reports
         run: python scripts/auto_maintain.py
+
+      - name: Refresh automated BGP origin audit reports
+        run: python scripts/bgp_auto.py
 
       - name: Build generated files
         run: python scripts/build.py
