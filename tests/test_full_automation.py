@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 import gzip
-import json
-import tempfile
 import unittest
-from pathlib import Path
 
-from scripts.bgp_auto import parse_origin_asns, parse_pfx2as
+from scripts.bgp_auto import build_audit, parse_origin_asns, parse_pfx2as
 from scripts.issue_auto_triage import decide
 from scripts.ruleset import ROOT
 
@@ -26,6 +23,12 @@ class FullAutomationTests(unittest.TestCase):
         self.assertEqual("1.0.1.0/24", records[0].prefix)
         self.assertEqual((4134, 4809), records[0].origins)
         self.assertEqual((4134, 4809), parse_origin_asns("AS4134,4809"))
+
+    def test_bgp_audit_allows_more_specific_overlaps(self) -> None:
+        payload = gzip.compress(b"1.0.0.0\t16\t4134\n1.0.1.0\t24\t4134\n")
+        records = parse_pfx2as(payload)
+        audit = build_audit(records, main_asns=(4134,), rir_asns=(), source_url="local", sha256="test")
+        self.assertEqual(("1.0.0.0/16", "1.0.1.0/24"), audit.main_prefixes)
 
     def test_issue_auto_triage_classifies_valid_and_incomplete_reports(self) -> None:
         incomplete = decide("missing: example.cn", "")
