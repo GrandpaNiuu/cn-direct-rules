@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ipaddress
 import json
+import os
 import re
 import sys
 from dataclasses import dataclass
@@ -124,10 +125,11 @@ def decide(title: str, body: str) -> Decision:
 
 
 def write_outputs(decision: Decision) -> None:
-    output_path = Path(__import__("os").environ.get("GITHUB_OUTPUT", ""))
-    if not output_path:
+    output_name = os.environ.get("GITHUB_OUTPUT")
+    if not output_name:
         print(json.dumps(decision.__dict__, ensure_ascii=False, indent=2))
         return
+    output_path = Path(output_name)
     delimiter = "AUTO_TRIAGE_COMMENT"
     with output_path.open("a", encoding="utf-8") as handle:
         handle.write(f"label={decision.label}\n")
