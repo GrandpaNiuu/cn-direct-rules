@@ -43,3 +43,15 @@ _Avoid_: Dead-site probe, immediate cleanup
 **Retirement Circuit Breaker**:
 The guard that rejects a refresh when its proposed removals or IP coverage loss exceed configured safety limits.
 _Avoid_: Best-effort deletion
+
+**Routed Coverage**:
+Public prefixes observed through maintained BGP-derived sources and suitable for the canonical direct-routing model.
+_Avoid_: Registered allocation, guaranteed physical location
+
+**Registered Allocation Coverage**:
+Public resources whose initial allocation or assignment country is CN in APNIC statistics. It is an audit and optional artifact, not proof of current physical location.
+_Avoid_: GeoIP truth, routed coverage
+
+**Operator Slice**:
+An optional BGP-derived subset for one major mainland network operator. It may differ from the Canonical Rule Model and is published separately.
+_Avoid_: Complete China IP list

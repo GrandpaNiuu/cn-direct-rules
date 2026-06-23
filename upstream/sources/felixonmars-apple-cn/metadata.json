@@ -1,0 +1,10 @@
+{
+  "counts": {
+    "domain-suffixes": 164
+  },
+  "id": "felixonmars-apple-cn",
+  "license": "WTFPL-2.0",
+  "project": "https://github.com/felixonmars/dnsmasq-china-list",
+  "selected_url": "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/apple.china.conf",
+  "sha256": "f1a36f9161a2084f3ecb1cafb4217a88f1b8fb0690ed795d22ad745f4058c4c8"
+}

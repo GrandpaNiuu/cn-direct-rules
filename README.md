@@ -64,9 +64,11 @@
 
 ## 🛡️ 里面有什么规则
 
-- ✅ 11 万级中国大陆导向域名规则，包括 `DOMAIN-SUFFIX,cn`
-- ✅ 已验证的中国大陆公网 IPv4 与 IPv6
+- ✅ 11.48 万级中国大陆导向域名规则，包括 Apple/Google 中国专项域名和 `DOMAIN-SUFFIX,cn`
+- ✅ 多路 APNIC/BGP 交叉验证的中国大陆公网 IPv4 与 IPv6
 - ✅ 每日维护的中国 ASN 清单
+- ✅ 电信、移动、联通、教育网和科技网独立运营商文件
+- ✅ APNIC 官方 CN 初始分配文件与覆盖审计
 - ✅ `GEOIP,CN` 兜底
 - ❌ 不含局域网、CGNAT、回环、链路本地等地址
 - ❌ 不含 `GEOSITE,cn`
@@ -91,6 +93,12 @@
 | `clash/cn-max.yaml` | Clash/Mihomo/Stash 最大覆盖档位 | [Raw](https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/clash/cn-max.yaml) |
 | `rule-set/cn.list` | 不带固定策略的远程规则集 | [Raw](https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/rule-set/cn.list) |
 | `rule-set/cn-max.list` | 不带固定策略的最大覆盖远程规则集 | [Raw](https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/rule-set/cn-max.list) |
+| `operators/chinanet.conf` | 中国电信 IPv4/IPv6 | [Raw](https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/operators/chinanet.conf) |
+| `operators/cmcc.conf` | 中国移动 IPv4/IPv6 | [Raw](https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/operators/cmcc.conf) |
+| `operators/unicom.conf` | 中国联通 IPv4/IPv6 | [Raw](https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/operators/unicom.conf) |
+| `operators/cernet.conf` | 中国教育网 IPv4/IPv6 | [Raw](https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/operators/cernet.conf) |
+| `operators/cstnet.conf` | 中国科技网 IPv4/IPv6 | [Raw](https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/operators/cstnet.conf) |
+| `registry/cn-allocated.conf` | APNIC 登记为 CN 的初始分配；不等同实时地理位置 | [Raw](https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/registry/cn-allocated.conf) |
 | `SHA256SUMS` | 所有发布文件的 SHA-256 | [Raw](https://raw.githubusercontent.com/GrandpaNiuu/cn-direct-rules/main/dist/SHA256SUMS) |
 
 <details>
@@ -118,8 +126,10 @@ python scripts/validate.py
 - 🧭 大陆 DNS 路由域名：[felixonmars/dnsmasq-china-list](https://github.com/felixonmars/dnsmasq-china-list)
 - 📡 APNIC/BGP 中国公网 IP：[fernvenue/chn-cidr-list](https://github.com/fernvenue/chn-cidr-list)
 - 📶 独立 BGP 运营商 IP：[gaoyifan/china-operator-ip](https://github.com/gaoyifan/china-operator-ip)
+- ⚡ 每小时 BGP 中国 IPv4：[misakaio/chnroutes2](https://github.com/misakaio/chnroutes2)
+- 🏛️ 官方初始分配审计：[APNIC delegated statistics](https://ftp.apnic.net/stats/apnic/delegated-apnic-latest)
 - 🛰️ 每日中国 ASN：[missuo/ASN-China](https://github.com/missuo/ASN-China)
 
 安装按钮形式参考 [LOWERTOP/Shadowrocket-First](https://github.com/LOWERTOP/Shadowrocket-First)。二次聚合、来源不清或许可条件不适合本仓库的清单不会为了“看起来更多”而重复加入。
 
-详细信息见 [第三方许可](THIRD_PARTY_NOTICES.md) 与 [自检说明](docs/SELF_AUDIT.md)。仓库代码采用 MIT License。规则只能降低误分流概率，无法保证所有网络、服务或地区在任何时刻都可用。
+详细信息见 [来源准入策略](docs/SOURCE_POLICY.md)、[数据许可](DATA_LICENSE.md)、[第三方许可](THIRD_PARTY_NOTICES.md) 与 [自检说明](docs/SELF_AUDIT.md)。仓库代码采用 MIT License；包含 chnroutes2 数据的生成规则受 CC BY-SA 4.0 的署名与相同方式共享要求约束。规则只能降低误分流概率，无法保证所有网络、服务或地区在任何时刻都可用。

@@ -364,7 +364,6 @@
       "apidns.kwd.inkuai.com": 1,
       "apifox.cn": 1,
       "apipost.cn": 1,
-      "app-measurement.com": 1,
       "apple-dns.net.cn": 1,
       "apple.cn": 1,
       "apple.com.cn": 1,
@@ -2441,7 +2440,7 @@
     }
   },
   "observation_day": "2026-06-23",
-  "observation_id": "cfcb4f3712c3fce287f57333d05ab56b9991d43fb2aaf5b0cd5dba7bd3b0a524",
+  "observation_id": "b595284f81f012ba67c7c138165686607b16f6067f6139e8f8c3c6d96c9f2571",
   "policy": {
     "max_retire_count": 1000,
     "max_retire_ratio": 0.01,

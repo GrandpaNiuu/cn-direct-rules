@@ -1,0 +1,6 @@
+chnroutes2
+Copyright (C) 2021 Misaka Network, Inc.
+
+Source: https://github.com/misakaio/chnroutes2
+License: Creative Commons Attribution-ShareAlike 4.0 International
+License URL: https://creativecommons.org/licenses/by-sa/4.0/

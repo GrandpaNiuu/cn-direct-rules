@@ -1,0 +1,11 @@
+{
+  "counts": {
+    "operator-unicom-ipv4": 3779,
+    "operator-unicom-ipv6": 1324
+  },
+  "id": "gaoyifan-unicom",
+  "license": "MIT",
+  "project": "https://github.com/gaoyifan/china-operator-ip",
+  "selected_url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom46.txt",
+  "sha256": "ee8195c99e654a266e0e7238f5cd31a89f0f201597a01b090cbb633c33f0c772"
+}

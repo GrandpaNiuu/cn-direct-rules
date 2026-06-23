@@ -12,12 +12,15 @@ from scripts.build import build
 from scripts.ruleset import ROOT, load_rules, render_outputs, validate_rules
 from scripts.update_sources import (
     LifecyclePolicy,
+    can_advance_category,
     download_first,
     download_consensus,
     guard_source_drift,
     normalize_candidate,
     parse_asn_list,
     parse_dnsmasq_domains,
+    parse_rir_allocations,
+    registry_coverage,
     reconcile_values,
     resolve_domain_files,
 )
@@ -40,6 +43,22 @@ class RuleRepositoryTests(unittest.TestCase):
         self.assertNotIn(",DIRECT", outputs["clash/cn.yaml"])
         self.assertNotIn(",DIRECT", outputs["rule-set/cn.list"])
         self.assertNotIn(",DIRECT", outputs["rule-set/cn-max.list"])
+
+    def test_major_operator_artifacts_include_both_ip_families(self) -> None:
+        outputs = render_outputs(self.rules)
+        for operator in ("chinanet", "cmcc", "unicom", "cernet", "cstnet"):
+            content = outputs[f"operators/{operator}.conf"]
+            self.assertIn("IP-CIDR,", content, operator)
+            self.assertIn("IP-CIDR6,", content, operator)
+            self.assertNotIn("GEOIP,", content, operator)
+            self.assertNotIn("IP-ASN,", content, operator)
+
+    def test_official_registry_artifact_is_published_separately(self) -> None:
+        content = render_outputs(self.rules)["registry/cn-allocated.conf"]
+        self.assertIn("IP-CIDR,", content)
+        self.assertIn("IP-CIDR6,", content)
+        self.assertNotIn("GEOIP,", content)
+        self.assertNotIn("IP-ASN,", content)
 
     def test_max_coverage_contains_strict_domains(self) -> None:
         self.assertGreaterEqual(
@@ -248,6 +267,27 @@ class RuleRepositoryTests(unittest.TestCase):
         self.assertEqual(("example.com", "two.example"), domains)
         self.assertEqual((4134, 24429), asns)
 
+    def test_apnic_registry_records_are_converted_to_exact_cn_networks(self) -> None:
+        snapshot = parse_rir_allocations(
+            "2|apnic|20260623|10|19830613|20260622|+1000\n"
+            "apnic|CN|ipv4|1.0.1.0|256|20110414|allocated\n"
+            "apnic|CN|ipv6|2400:3200::|32|20110414|allocated\n"
+            "apnic|HK|ipv4|1.2.3.0|256|20110414|allocated\n"
+            "apnic|CN|ipv4|1.2.3.0|256|20110414|available\n"
+        )
+        self.assertEqual("20260623", snapshot.serial_date)
+        self.assertEqual(("1.0.1.0/24",), snapshot.ipv4)
+        self.assertEqual(("2400:3200::/32",), snapshot.ipv6)
+
+    def test_registry_audit_reports_allocations_missing_from_routed_rules(self) -> None:
+        audit = registry_coverage(
+            routed=("1.0.1.0/24",),
+            registered=("1.0.1.0/24", "1.0.2.0/24"),
+        )
+        self.assertEqual(512, audit.registered_addresses)
+        self.assertEqual(256, audit.missing_addresses)
+        self.assertEqual(0.5, audit.missing_ratio)
+
     def test_rule_is_retired_only_after_consecutive_successful_absences(self) -> None:
         policy = LifecyclePolicy(retire_after_successes=3, max_retire_ratio=0.5)
         first = reconcile_values(
@@ -294,6 +334,30 @@ class RuleRepositoryTests(unittest.TestCase):
         )
         self.assertEqual({"missing.example": 1}, result.missing_counts)
         self.assertIn("missing.example", result.values)
+
+    def test_only_a_relevant_source_failure_stops_category_retirement(self) -> None:
+        sources = [
+            {"id": "domains", "categories": ["domain-suffixes"]},
+            {"id": "operator", "categories": ["operator-cmcc-ipv4"]},
+        ]
+        self.assertTrue(
+            can_advance_category(
+                sources,
+                {"domains": "refreshed", "operator": "retained after refresh failure"},
+                "domain-suffixes",
+                "2026-06-22",
+                "2026-06-23",
+            )
+        )
+        self.assertFalse(
+            can_advance_category(
+                sources,
+                {"domains": "retained after refresh failure", "operator": "refreshed"},
+                "domain-suffixes",
+                "2026-06-22",
+                "2026-06-23",
+            )
+        )
 
     def test_checked_in_outputs_are_reproducible(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

@@ -45,6 +45,92 @@ class DomainSnapshot:
 
 
 @dataclass(frozen=True)
+class RegistrySnapshot:
+    serial_date: str
+    ipv4: tuple[str, ...]
+    ipv6: tuple[str, ...]
+
+    @property
+    def total(self) -> int:
+        return len(self.ipv4) + len(self.ipv6)
+
+
+@dataclass(frozen=True)
+class RegistryCoverage:
+    registered_addresses: int
+    missing_addresses: int
+    missing_ratio: float
+
+
+def registry_coverage(
+    routed: tuple[str, ...], registered: tuple[str, ...]
+) -> RegistryCoverage:
+    routed_networks = [ipaddress.ip_network(value, strict=True) for value in routed]
+    registered_networks = [
+        ipaddress.ip_network(value, strict=True) for value in registered
+    ]
+    registered_addresses = sum(
+        network.num_addresses
+        for network in ipaddress.collapse_addresses(registered_networks)
+    )
+    routed_addresses = sum(
+        network.num_addresses for network in ipaddress.collapse_addresses(routed_networks)
+    )
+    union_addresses = sum(
+        network.num_addresses
+        for network in ipaddress.collapse_addresses(
+            [*routed_networks, *registered_networks]
+        )
+    )
+    missing_addresses = union_addresses - routed_addresses
+    return RegistryCoverage(
+        registered_addresses,
+        missing_addresses,
+        missing_addresses / registered_addresses if registered_addresses else 0.0,
+    )
+
+
+def parse_rir_allocations(text: str, country: str = "CN") -> RegistrySnapshot:
+    serial_date = ""
+    ipv4: list[ipaddress.IPv4Network] = []
+    ipv6: list[ipaddress.IPv6Network] = []
+    for raw_line in text.splitlines():
+        fields = raw_line.strip().split("|")
+        if len(fields) == 7 and fields[0] == "2" and fields[1] == "apnic":
+            serial_date = fields[2]
+            continue
+        if (
+            len(fields) != 7
+            or fields[0] != "apnic"
+            or fields[1] != country
+            or fields[2] not in {"ipv4", "ipv6"}
+            or fields[6] not in {"allocated", "assigned"}
+        ):
+            continue
+        if fields[2] == "ipv4":
+            start = ipaddress.IPv4Address(fields[3])
+            count = int(fields[4])
+            if count <= 0 or int(start) + count - 1 > 2**32 - 1:
+                raise ValueError(f"invalid APNIC IPv4 allocation: {raw_line}")
+            end = ipaddress.IPv4Address(int(start) + count - 1)
+            ipv4.extend(ipaddress.summarize_address_range(start, end))
+        else:
+            ipv6.append(ipaddress.ip_network(f"{fields[3]}/{fields[4]}", strict=True))
+    if not re.fullmatch(r"\d{8}", serial_date):
+        raise ValueError("APNIC statistics header has no valid serial date")
+    collapsed4 = tuple(sorted(ipaddress.collapse_addresses(ipv4), key=network_sort_key))
+    collapsed6 = tuple(sorted(ipaddress.collapse_addresses(ipv6), key=network_sort_key))
+    errors = [*validate_networks(collapsed4, 4), *validate_networks(collapsed6, 6)]
+    if errors:
+        raise ValueError("; ".join(errors[:20]))
+    return RegistrySnapshot(
+        serial_date,
+        tuple(str(network) for network in collapsed4),
+        tuple(str(network) for network in collapsed6),
+    )
+
+
+@dataclass(frozen=True)
 class LifecyclePolicy:
     retire_after_successes: int = 3
     max_retire_ratio: float = 0.01
@@ -94,6 +180,25 @@ def reconcile_values(
         missing_counts=dict(sorted(next_missing.items(), key=lambda item: item[0].casefold())),
         added=tuple(sorted(observed_set - previous_set, key=str.casefold)),
         retired=tuple(sorted(retired, key=str.casefold)),
+    )
+
+
+def can_advance_category(
+    sources: list[dict[str, Any]],
+    statuses: dict[str, str],
+    category: str,
+    previous_day: str | None,
+    observation_day: str,
+) -> bool:
+    if previous_day == observation_day:
+        return False
+    relevant_source_ids = {
+        source["id"]
+        for source in sources
+        if category in source.get("categories", [source.get("category")])
+    }
+    return bool(relevant_source_ids) and all(
+        statuses.get(source_id) == "refreshed" for source_id in relevant_source_ids
     )
 
 
@@ -381,6 +486,46 @@ def _fetch_source(source: dict[str, Any]) -> tuple[dict[str, tuple[str, ...]], d
             source["max_entries"],
         )
         values = {source["category"]: tuple(content.splitlines())}
+    elif kind == "mixed-cidr":
+        parsed = [
+            ipaddress.ip_network(line.strip(), strict=True)
+            for line in payload.decode("utf-8").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        ]
+        normalized: dict[int, tuple[ipaddress._BaseNetwork, ...]] = {}
+        for version in (4, 6):
+            networks = tuple(
+                sorted(
+                    ipaddress.collapse_addresses(
+                        network for network in parsed if network.version == version
+                    ),
+                    key=network_sort_key,
+                )
+            )
+            errors = validate_networks(networks, version)
+            if errors:
+                raise ValueError("; ".join(errors[:20]))
+            normalized[version] = networks
+        _validate_count(source, sum(len(items) for items in normalized.values()))
+        prefix = source["category_prefix"]
+        values = {
+            f"{prefix}-ipv4": tuple(str(network) for network in normalized[4]),
+            f"{prefix}-ipv6": tuple(str(network) for network in normalized[6]),
+        }
+    elif kind == "rir-statistics":
+        snapshot = parse_rir_allocations(payload.decode("utf-8"))
+        _validate_count(source, snapshot.total)
+        serial_date = datetime.strptime(snapshot.serial_date, "%Y%m%d").date()
+        age_days = (datetime.now(ZoneInfo("UTC")).date() - serial_date).days
+        if not 0 <= age_days <= source["max_age_days"]:
+            raise ValueError(
+                f"{source['id']} serial date is {age_days} days old"
+            )
+        values = {
+            "registry-ipv4": snapshot.ipv4,
+            "registry-ipv6": snapshot.ipv6,
+        }
+        extra["serial_date"] = snapshot.serial_date
     elif kind == "asn":
         asns = parse_asn_list(payload.decode("utf-8"))
         _validate_count(source, len(asns))
@@ -557,6 +702,28 @@ def update(root: Path = ROOT) -> list[Path]:
                 f"{bounds[name]['min_entries']}..{bounds[name]['max_entries']}"
             )
 
+    registry_audit: dict[str, dict[str, int | float]] = {}
+    for name in ("ipv4", "ipv6"):
+        registered = tuple(
+            sorted(
+                unions.get(f"registry-{name}", set()),
+                key=lambda value: network_sort_key(ipaddress.ip_network(value)),
+            )
+        )
+        if not registered:
+            continue
+        audit = registry_coverage(observed[name], registered)
+        if audit.missing_ratio > config["policy"]["max_registry_coverage_gap_ratio"]:
+            raise ValueError(
+                f"{name} registry coverage gap {audit.missing_ratio:.2%} exceeds "
+                f"{config['policy']['max_registry_coverage_gap_ratio']:.2%}"
+            )
+        registry_audit[name] = {
+            "registered_addresses": audit.registered_addresses,
+            "missing_addresses": audit.missing_addresses,
+            "missing_ratio": audit.missing_ratio,
+        }
+
     for name in ("ipv4", "ipv6"):
         previous_path = root / "upstream" / f"{name}.txt"
         previous = tuple(previous_path.read_text(encoding="utf-8").splitlines()) if previous_path.exists() else ()
@@ -587,9 +754,6 @@ def update(root: Path = ROOT) -> list[Path]:
         ).encode("utf-8")
     ).hexdigest()
     all_sources_refreshed = all(status == "refreshed" for status in statuses.values())
-    advance_missing = (
-        lifecycle.get("observation_id") != observation_id and all_sources_refreshed
-    )
     policy = LifecyclePolicy(
         retire_after_successes=config["policy"]["retire_after_successes"],
         max_retire_ratio=config["policy"]["max_retire_ratio"],
@@ -603,13 +767,22 @@ def update(root: Path = ROOT) -> list[Path]:
         "domain-keywords": "domain-keywords.txt",
         "asns": "asns.txt",
     }
+    category_advancement: dict[str, bool] = {}
     for category, filename in aggregate_names.items():
+        advance_category = can_advance_category(
+            config["sources"],
+            statuses,
+            category,
+            lifecycle.get("observation_day"),
+            observation_day,
+        )
+        category_advancement[category] = advance_category
         result = reconcile_values(
             _seed_previous(root, category, lifecycle_exists),
             observed[category],
             lifecycle.get("missing_counts", {}).get(category, {}),
             policy,
-            advance_missing=advance_missing,
+            advance_missing=advance_category,
         )
         next_missing[category] = result.missing_counts
         lifecycle_report[category] = {
@@ -657,8 +830,10 @@ def update(root: Path = ROOT) -> list[Path]:
                 "asns": len(candidates[root / "upstream" / "asns.txt"].splitlines()),
             },
             "lifecycle": lifecycle_report,
+            "registry_coverage": registry_audit,
             "all_sources_refreshed": all_sources_refreshed,
-            "observation_advanced": advance_missing,
+            "category_observation_advanced": category_advancement,
+            "observation_advanced": any(category_advancement.values()),
             "sources": statuses,
         },
         indent=2,

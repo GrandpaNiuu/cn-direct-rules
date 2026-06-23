@@ -1,0 +1,10 @@
+APNIC delegated statistics conditions of use
+
+The files are freely available for download and use on the condition that
+APNIC will not be held responsible for any loss or damage arising from use
+of the information in these reports. APNIC endeavours to ensure accuracy but
+makes no guarantee. The reports indicate where resources were first allocated
+or assigned and are not an authoritative statement of current location.
+
+Source: https://ftp.apnic.net/stats/apnic/delegated-apnic-latest
+Format: https://www.apnic.net/about-apnic/corporate-documents/documents/resource-guidelines/rir-statistics-exchange-format/

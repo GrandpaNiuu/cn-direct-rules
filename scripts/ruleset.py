@@ -9,6 +9,10 @@ from typing import Iterable
 
 
 ROOT = Path(__file__).resolve().parents[1]
+DATA_NOTICE = (
+    "# Data provenance and licenses: "
+    "https://github.com/GrandpaNiuu/cn-direct-rules/blob/main/DATA_LICENSE.md"
+)
 
 
 @dataclass(frozen=True)
@@ -24,6 +28,8 @@ class RuleSet:
     ipv4: tuple[ipaddress.IPv4Network, ...]
     ipv6: tuple[ipaddress.IPv6Network, ...]
     asns: tuple[int, ...]
+    operator_networks: dict[str, tuple[ipaddress._BaseNetwork, ...]]
+    registry_networks: tuple[ipaddress._BaseNetwork, ...]
 
 
 def read_values(path: Path) -> tuple[str, ...]:
@@ -42,6 +48,39 @@ def load_rules(root: Path = ROOT) -> RuleSet:
         (root / "upstream" / "domain-metadata.json").read_text(encoding="utf-8")
     )
     forbidden = set(read_values(root / "config" / "forbidden-domain-suffixes.txt"))
+    source_config = json.loads(
+        (root / "config" / "sources.json").read_text(encoding="utf-8")
+    )
+    operator_networks: dict[str, tuple[ipaddress._BaseNetwork, ...]] = {}
+    registry_networks: list[ipaddress._BaseNetwork] = []
+    for source in source_config["sources"]:
+        if source["kind"] == "rir-statistics":
+            for category in source["categories"]:
+                registry_networks.extend(
+                    ipaddress.ip_network(value, strict=True)
+                    for value in read_values(
+                        root
+                        / "upstream"
+                        / "sources"
+                        / source["id"]
+                        / f"{category}.txt"
+                    )
+                )
+            continue
+        if source["kind"] != "mixed-cidr":
+            continue
+        operator = source["category_prefix"].removeprefix("operator-")
+        values: list[ipaddress._BaseNetwork] = []
+        for category in source["categories"]:
+            values.extend(
+                ipaddress.ip_network(value, strict=True)
+                for value in read_values(
+                    root / "upstream" / "sources" / source["id"] / f"{category}.txt"
+                )
+            )
+        operator_networks[operator] = tuple(
+            sorted(values, key=lambda network: (network.version, *network_sort_key(network)))
+        )
 
     max_exact = tuple(sorted(set(upstream_exact), key=str.casefold))
     max_suffixes = tuple(sorted(set(upstream_suffixes), key=str.casefold))
@@ -76,6 +115,13 @@ def load_rules(root: Path = ROOT) -> RuleSet:
             for value in read_values(root / "upstream" / "ipv6.txt")
         ),
         asns=tuple(int(value) for value in read_values(root / "upstream" / "asns.txt")),
+        operator_networks=operator_networks,
+        registry_networks=tuple(
+            sorted(
+                registry_networks,
+                key=lambda network: (network.version, *network_sort_key(network)),
+            )
+        ),
     )
 
 
@@ -184,6 +230,23 @@ def validate_rules(rules: RuleSet, root: Path = ROOT) -> list[str]:
 
     errors.extend(validate_networks(rules.ipv4, 4))
     errors.extend(validate_networks(rules.ipv6, 6))
+    for operator, networks in rules.operator_networks.items():
+        operator_v4 = tuple(network for network in networks if network.version == 4)
+        operator_v6 = tuple(network for network in networks if network.version == 6)
+        errors.extend(
+            f"operator {operator}: {error}"
+            for error in (*validate_networks(operator_v4, 4), *validate_networks(operator_v6, 6))
+        )
+    registry_v4 = tuple(network for network in rules.registry_networks if network.version == 4)
+    registry_v6 = tuple(network for network in rules.registry_networks if network.version == 6)
+    errors.extend(
+        f"registry: {error}"
+        for error in (*validate_networks(registry_v4, 4), *validate_networks(registry_v6, 6))
+    )
+    if tuple(ipaddress.collapse_addresses((*rules.ipv4, *registry_v4))) != rules.ipv4:
+        errors.append("official registry IPv4 is not contained in canonical coverage")
+    if tuple(ipaddress.collapse_addresses((*rules.ipv6, *registry_v6))) != rules.ipv6:
+        errors.append("official registry IPv6 is not contained in canonical coverage")
 
     source_config = json.loads((root / "config" / "sources.json").read_text(encoding="utf-8"))
     aggregate_bounds = source_config["aggregate_bounds"]
@@ -243,6 +306,20 @@ def validate_rules(rules: RuleSet, root: Path = ROOT) -> list[str]:
         }
         if report.get("aggregate_counts") != expected_report_counts:
             errors.append("update report aggregate counts do not match canonical rules")
+        expected_registry_coverage = {}
+        for name, version in (("ipv4", 4), ("ipv6", 6)):
+            registered_addresses = sum(
+                network.num_addresses
+                for network in rules.registry_networks
+                if network.version == version
+            )
+            expected_registry_coverage[name] = {
+                "registered_addresses": registered_addresses,
+                "missing_addresses": 0,
+                "missing_ratio": 0.0,
+            }
+        if report.get("registry_coverage") != expected_registry_coverage:
+            errors.append("registry coverage report does not match verified snapshots")
     for source in source_config["sources"]:
         metadata_path = root / "upstream" / "sources" / source["id"] / "metadata.json"
         if not metadata_path.exists():
@@ -253,6 +330,10 @@ def validate_rules(rules: RuleSet, root: Path = ROOT) -> list[str]:
             errors.append(f"source project mismatch for {source['id']}")
         if source_metadata.get("license") != source["license"]:
             errors.append(f"source license mismatch for {source['id']}")
+        if source["kind"] == "rir-statistics":
+            serial_date = source_metadata.get("serial_date", "")
+            if len(serial_date) != 8 or not serial_date.isdigit():
+                errors.append(f"invalid registry serial date for {source['id']}")
         digest = source_metadata.get("sha256", "")
         if len(digest) != 64 or any(character not in "0123456789abcdef" for character in digest):
             errors.append(f"invalid source content hash for {source['id']}")
@@ -288,6 +369,7 @@ def _header(title: str) -> list[str]:
         "[Rule]",
         f"# {title}",
         "# AUTO-GENERATED by scripts/build.py; do not edit this file directly.",
+        DATA_NOTICE,
         "# No LAN ranges. IPv6 retained. GEOSITE intentionally omitted.",
         "",
     ]
@@ -409,6 +491,7 @@ def render_outputs(rules: RuleSet) -> dict[str, str]:
     max_provider = [*max_domain_provider_rules, *ip_provider_rules]
     clash_lines = [
         "# AUTO-GENERATED classical rule-provider for Clash/Mihomo/Stash.",
+        DATA_NOTICE,
         "# Assign the provider to DIRECT in the client configuration.",
         "payload:",
         *(f"  - '{value}'" for value in strict_provider),
@@ -416,6 +499,7 @@ def render_outputs(rules: RuleSet) -> dict[str, str]:
     ]
     clash_max_lines = [
         "# AUTO-GENERATED maximum-coverage classical provider for Clash/Mihomo/Stash.",
+        DATA_NOTICE,
         "# Assign the provider to DIRECT in the client configuration.",
         "payload:",
         *(f"  - '{value}'" for value in max_provider),
@@ -423,11 +507,13 @@ def render_outputs(rules: RuleSet) -> dict[str, str]:
     ]
     rule_set_lines = [
         "# AUTO-GENERATED policy-free remote rule set.",
+        DATA_NOTICE,
         *strict_provider,
         "",
     ]
     max_rule_set_lines = [
         "# AUTO-GENERATED maximum-coverage policy-free remote rule set.",
+        DATA_NOTICE,
         *max_provider,
         "",
     ]
@@ -435,6 +521,7 @@ def render_outputs(rules: RuleSet) -> dict[str, str]:
         "#!name=CN Direct Rules · Complete",
         "#!desc=中国大陆公网独立完整直连模块；自动更新，不含局域网规则。",
         "# Generated from https://github.com/GrandpaNiuu/cn-direct-rules",
+        DATA_NOTICE,
         "",
         "[Rule]",
         *max_domain_rules,
@@ -447,6 +534,7 @@ def render_outputs(rules: RuleSet) -> dict[str, str]:
     shadowrocket_config_lines = [
         "# CN Direct Rules · Complete Configuration",
         "# AUTO-GENERATED by scripts/build.py; do not edit this file directly.",
+        DATA_NOTICE,
         "# Importing this file replaces the current Shadowrocket configuration.",
         "",
         "[General]",
@@ -480,12 +568,33 @@ def render_outputs(rules: RuleSet) -> dict[str, str]:
         "shadowrocket/cn-direct.sgmodule": "\n".join(shadowrocket_module_lines),
         "shadowrocket/cn-direct.conf": "\n".join(shadowrocket_config_lines),
     }
+    for operator, networks in sorted(rules.operator_networks.items()):
+        operator_lines = [
+            *_header(f"China mainland {operator} public IP direct rules"),
+            *(
+                f"IP-CIDR{'' if network.version == 4 else '6'},{network},DIRECT,no-resolve"
+                for network in networks
+            ),
+            "",
+        ]
+        outputs[f"operators/{operator}.conf"] = "\n".join(operator_lines)
+    registry_lines = [
+        *_header("APNIC-registered mainland China public IP rules"),
+        "# Registration country is not a guarantee of current physical location.",
+        *(
+            f"IP-CIDR{'' if network.version == 4 else '6'},{network},DIRECT,no-resolve"
+            for network in rules.registry_networks
+        ),
+        "",
+    ]
+    outputs["registry/cn-allocated.conf"] = "\n".join(registry_lines)
     hashes = {
         name: hashlib.sha256(content.encode("utf-8")).hexdigest()
         for name, content in sorted(outputs.items())
     }
     manifest = {
         "schema_version": 1,
+        "data_license": "https://github.com/GrandpaNiuu/cn-direct-rules/blob/main/DATA_LICENSE.md",
         "counts": {
             "asns": len(rules.asns),
             "domains": {
@@ -502,6 +611,14 @@ def render_outputs(rules: RuleSet) -> dict[str, str]:
             },
             "ipv4": len(rules.ipv4),
             "ipv6": len(rules.ipv6),
+            "operators": {
+                operator: len(networks)
+                for operator, networks in sorted(rules.operator_networks.items())
+            },
+            "registry": {
+                "ipv4": sum(network.version == 4 for network in rules.registry_networks),
+                "ipv6": sum(network.version == 6 for network in rules.registry_networks),
+            },
         },
         "files": hashes,
         "upstream": {

@@ -1,0 +1,11 @@
+{
+  "counts": {
+    "operator-cstnet-ipv4": 44,
+    "operator-cstnet-ipv6": 7
+  },
+  "id": "gaoyifan-cstnet",
+  "license": "MIT",
+  "project": "https://github.com/gaoyifan/china-operator-ip",
+  "selected_url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet46.txt",
+  "sha256": "96644eec41351f2fd0bf87f4401748e79504bc6e8ee173ec5f4c7e398bd73edb"
+}

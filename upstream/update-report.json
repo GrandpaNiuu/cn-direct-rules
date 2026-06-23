@@ -2,13 +2,19 @@
   "aggregate_counts": {
     "asns": 5243,
     "exact": 63,
-    "ipv4": 5690,
+    "ipv4": 5781,
     "ipv6": 2264,
     "keywords": 29,
     "skipped_regexes": 3,
-    "suffixes": 114517
+    "suffixes": 114788
   },
   "all_sources_refreshed": true,
+  "category_observation_advanced": {
+    "asns": false,
+    "domain-exact": false,
+    "domain-keywords": false,
+    "domain-suffixes": false
+  },
   "lifecycle": {
     "asns": {
       "added": 0,
@@ -27,17 +33,38 @@
     },
     "domain-suffixes": {
       "added": 0,
-      "retained_missing": 2326,
+      "retained_missing": 2325,
       "retired": 0
     }
   },
   "observation_advanced": false,
+  "registry_coverage": {
+    "ipv4": {
+      "missing_addresses": 0,
+      "missing_ratio": 0.0,
+      "registered_addresses": 342935296
+    },
+    "ipv6": {
+      "missing_addresses": 0,
+      "missing_ratio": 0.0,
+      "registered_addresses": 5429109925750474385080158125031424
+    }
+  },
   "sources": {
+    "apnic-cn-registry": "refreshed",
+    "chnroutes2-ipv4": "refreshed",
+    "felixonmars-apple-cn": "refreshed",
     "felixonmars-cn": "refreshed",
+    "felixonmars-google-cn": "refreshed",
     "fernvenue-ipv4": "refreshed",
     "fernvenue-ipv6": "refreshed",
+    "gaoyifan-cernet": "refreshed",
+    "gaoyifan-chinanet": "refreshed",
+    "gaoyifan-cmcc": "refreshed",
+    "gaoyifan-cstnet": "refreshed",
     "gaoyifan-ipv4": "refreshed",
     "gaoyifan-ipv6": "refreshed",
+    "gaoyifan-unicom": "refreshed",
     "missuo-asn-cn": "refreshed",
     "v2fly-cn": "refreshed"
   }

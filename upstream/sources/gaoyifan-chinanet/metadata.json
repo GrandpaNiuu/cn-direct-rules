@@ -1,0 +1,11 @@
+{
+  "counts": {
+    "operator-chinanet-ipv4": 4007,
+    "operator-chinanet-ipv6": 844
+  },
+  "id": "gaoyifan-chinanet",
+  "license": "MIT",
+  "project": "https://github.com/gaoyifan/china-operator-ip",
+  "selected_url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet46.txt",
+  "sha256": "248f58aaf99e2bd65f90783ceeec89dca2bb769e22eae0d2075dead5bd71b7c9"
+}

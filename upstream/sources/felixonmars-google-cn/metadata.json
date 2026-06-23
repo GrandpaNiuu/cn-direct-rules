@@ -1,0 +1,10 @@
+{
+  "counts": {
+    "domain-suffixes": 112
+  },
+  "id": "felixonmars-google-cn",
+  "license": "WTFPL-2.0",
+  "project": "https://github.com/felixonmars/dnsmasq-china-list",
+  "selected_url": "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/google.china.conf",
+  "sha256": "ac6d5a7f6c034694bcb81dde0350bbed940e47d03a87da0a318afc99780bb7c6"
+}

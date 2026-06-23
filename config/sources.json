@@ -3,7 +3,8 @@
     "retire_after_successes": 3,
     "max_retire_ratio": 0.01,
     "max_retire_count": 1000,
-    "max_ip_coverage_drop_ratio": 0.01
+    "max_ip_coverage_drop_ratio": 0.01,
+    "max_registry_coverage_gap_ratio": 0.005
   },
   "aggregate_bounds": {
     "domain": {"min_entries": 90000, "max_entries": 180000},
@@ -38,6 +39,34 @@
       "min_entries": 90000,
       "max_entries": 160000,
       "max_bytes": 8000000,
+      "license": "WTFPL-2.0",
+      "project": "https://github.com/felixonmars/dnsmasq-china-list"
+    },
+    {
+      "id": "felixonmars-apple-cn",
+      "kind": "dnsmasq-domains",
+      "categories": ["domain-suffixes"],
+      "urls": [
+        "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/apple.china.conf",
+        "https://gitlab.com/felixonmars/dnsmasq-china-list/-/raw/master/apple.china.conf"
+      ],
+      "min_entries": 100,
+      "max_entries": 300,
+      "max_bytes": 100000,
+      "license": "WTFPL-2.0",
+      "project": "https://github.com/felixonmars/dnsmasq-china-list"
+    },
+    {
+      "id": "felixonmars-google-cn",
+      "kind": "dnsmasq-domains",
+      "categories": ["domain-suffixes"],
+      "urls": [
+        "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/google.china.conf",
+        "https://gitlab.com/felixonmars/dnsmasq-china-list/-/raw/master/google.china.conf"
+      ],
+      "min_entries": 75,
+      "max_entries": 250,
+      "max_bytes": 100000,
       "license": "WTFPL-2.0",
       "project": "https://github.com/felixonmars/dnsmasq-china-list"
     },
@@ -104,6 +133,116 @@
       "min_entries": 1200,
       "max_entries": 2500,
       "max_bytes": 1000000,
+      "license": "MIT",
+      "project": "https://github.com/gaoyifan/china-operator-ip"
+    },
+    {
+      "id": "chnroutes2-ipv4",
+      "kind": "cidr",
+      "category": "ipv4",
+      "version": 4,
+      "strategy": "first",
+      "urls": [
+        "https://raw.githubusercontent.com/misakaio/chnroutes2/master/chnroutes.txt"
+      ],
+      "min_entries": 3000,
+      "max_entries": 5000,
+      "max_bytes": 1000000,
+      "license": "CC-BY-SA-4.0",
+      "project": "https://github.com/misakaio/chnroutes2"
+    },
+    {
+      "id": "apnic-cn-registry",
+      "kind": "rir-statistics",
+      "categories": ["registry-ipv4", "registry-ipv6"],
+      "urls": [
+        "https://ftp.apnic.net/stats/apnic/delegated-apnic-latest",
+        "https://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest"
+      ],
+      "min_entries": 6500,
+      "max_entries": 9000,
+      "max_age_days": 3,
+      "max_bytes": 8000000,
+      "license": "APNIC-Conditions-of-Use",
+      "project": "https://www.apnic.net/about-apnic/corporate-documents/documents/resource-guidelines/rir-statistics-exchange-format/"
+    },
+    {
+      "id": "gaoyifan-chinanet",
+      "kind": "mixed-cidr",
+      "category_prefix": "operator-chinanet",
+      "categories": ["operator-chinanet-ipv4", "operator-chinanet-ipv6"],
+      "urls": [
+        "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/chinanet46.txt",
+        "https://gaoyifan.github.io/china-operator-ip/chinanet46.txt",
+        "https://china-operator-ip.yfgao.com/chinanet46.txt"
+      ],
+      "min_entries": 3500,
+      "max_entries": 6500,
+      "max_bytes": 1000000,
+      "license": "MIT",
+      "project": "https://github.com/gaoyifan/china-operator-ip"
+    },
+    {
+      "id": "gaoyifan-cmcc",
+      "kind": "mixed-cidr",
+      "category_prefix": "operator-cmcc",
+      "categories": ["operator-cmcc-ipv4", "operator-cmcc-ipv6"],
+      "urls": [
+        "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc46.txt",
+        "https://gaoyifan.github.io/china-operator-ip/cmcc46.txt",
+        "https://china-operator-ip.yfgao.com/cmcc46.txt"
+      ],
+      "min_entries": 800,
+      "max_entries": 2000,
+      "max_bytes": 1000000,
+      "license": "MIT",
+      "project": "https://github.com/gaoyifan/china-operator-ip"
+    },
+    {
+      "id": "gaoyifan-unicom",
+      "kind": "mixed-cidr",
+      "category_prefix": "operator-unicom",
+      "categories": ["operator-unicom-ipv4", "operator-unicom-ipv6"],
+      "urls": [
+        "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/unicom46.txt",
+        "https://gaoyifan.github.io/china-operator-ip/unicom46.txt",
+        "https://china-operator-ip.yfgao.com/unicom46.txt"
+      ],
+      "min_entries": 3500,
+      "max_entries": 6500,
+      "max_bytes": 1000000,
+      "license": "MIT",
+      "project": "https://github.com/gaoyifan/china-operator-ip"
+    },
+    {
+      "id": "gaoyifan-cernet",
+      "kind": "mixed-cidr",
+      "category_prefix": "operator-cernet",
+      "categories": ["operator-cernet-ipv4", "operator-cernet-ipv6"],
+      "urls": [
+        "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cernet46.txt",
+        "https://gaoyifan.github.io/china-operator-ip/cernet46.txt",
+        "https://china-operator-ip.yfgao.com/cernet46.txt"
+      ],
+      "min_entries": 100,
+      "max_entries": 400,
+      "max_bytes": 200000,
+      "license": "MIT",
+      "project": "https://github.com/gaoyifan/china-operator-ip"
+    },
+    {
+      "id": "gaoyifan-cstnet",
+      "kind": "mixed-cidr",
+      "category_prefix": "operator-cstnet",
+      "categories": ["operator-cstnet-ipv4", "operator-cstnet-ipv6"],
+      "urls": [
+        "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cstnet46.txt",
+        "https://gaoyifan.github.io/china-operator-ip/cstnet46.txt",
+        "https://china-operator-ip.yfgao.com/cstnet46.txt"
+      ],
+      "min_entries": 25,
+      "max_entries": 150,
+      "max_bytes": 200000,
       "license": "MIT",
       "project": "https://github.com/gaoyifan/china-operator-ip"
     },

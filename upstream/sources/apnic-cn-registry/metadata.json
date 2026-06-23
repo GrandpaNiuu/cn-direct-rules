@@ -1,0 +1,12 @@
+{
+  "counts": {
+    "registry-ipv4": 5488,
+    "registry-ipv6": 2012
+  },
+  "id": "apnic-cn-registry",
+  "license": "APNIC-Conditions-of-Use",
+  "project": "https://www.apnic.net/about-apnic/corporate-documents/documents/resource-guidelines/rir-statistics-exchange-format/",
+  "selected_url": "https://ftp.apnic.net/stats/apnic/delegated-apnic-latest",
+  "serial_date": "20260623",
+  "sha256": "ca3771d6636a9f48261d5cda364017336ad8e5ef9b577526731ba0b3c8a51345"
+}
