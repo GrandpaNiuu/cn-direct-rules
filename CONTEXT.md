@@ -31,3 +31,15 @@ _Avoid_: Module, rule fragment
 **Private-network Rule**:
 A rule for LAN, CGNAT, link-local, loopback, documentation, or otherwise non-public address space. It is intentionally outside this repository.
 _Avoid_: China IP rule
+
+**Verified Source Snapshot**:
+The latest successfully downloaded, parsed, bounded, and hashed data for one configured upstream. A failed refresh keeps this snapshot and does not count as evidence that rules disappeared.
+_Avoid_: Live truth, guaranteed-active list
+
+**Lifecycle Grace**:
+Three distinct successful source observations during which a missing domain or ASN is retained before it can be retired.
+_Avoid_: Dead-site probe, immediate cleanup
+
+**Retirement Circuit Breaker**:
+The guard that rejects a refresh when its proposed removals or IP coverage loss exceed configured safety limits.
+_Avoid_: Best-effort deletion

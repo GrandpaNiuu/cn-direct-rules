@@ -11,9 +11,14 @@ from unittest.mock import patch
 from scripts.build import build
 from scripts.ruleset import ROOT, load_rules, render_outputs, validate_rules
 from scripts.update_sources import (
+    LifecyclePolicy,
     download_first,
     download_consensus,
+    guard_source_drift,
     normalize_candidate,
+    parse_asn_list,
+    parse_dnsmasq_domains,
+    reconcile_values,
     resolve_domain_files,
 )
 
@@ -173,6 +178,9 @@ class RuleRepositoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "outside"):
             normalize_candidate("1.0.1.0/24\n", 4, 5000, 7000)
 
+        with self.assertRaisesRegex(ValueError, "source drift"):
+            guard_source_drift(100, 70, 0.2, "example")
+
     def test_source_normalizer_repairs_duplicate_and_overlapping_cidrs(self) -> None:
         normalized = normalize_candidate(
             "1.0.1.0/24\n1.0.1.0/25\n1.0.1.128/25\n1.0.1.0/24\n",
@@ -227,6 +235,65 @@ class RuleRepositoryTests(unittest.TestCase):
         self.assertEqual(("cn", "example.cn"), snapshot.suffixes)
         self.assertEqual(("mainland-app",), snapshot.keywords)
         self.assertEqual(1, snapshot.skipped_regexes)
+
+    def test_dnsmasq_and_asn_sources_are_parsed_without_inventing_rules(self) -> None:
+        domains = parse_dnsmasq_domains(
+            "server=/Example.COM/114.114.114.114\n"
+            "#server=/disabled.example/114.114.114.114\n"
+            "server=/two.example/114.114.114.114\n"
+        )
+        asns = parse_asn_list(
+            "// generated\nIP-ASN,4134 // China Telecom\nIP-ASN,24429\n"
+        )
+        self.assertEqual(("example.com", "two.example"), domains)
+        self.assertEqual((4134, 24429), asns)
+
+    def test_rule_is_retired_only_after_consecutive_successful_absences(self) -> None:
+        policy = LifecyclePolicy(retire_after_successes=3, max_retire_ratio=0.5)
+        first = reconcile_values(
+            previous=("a.example", "old.example"),
+            observed=("a.example",),
+            missing_counts={},
+            policy=policy,
+        )
+        second = reconcile_values(
+            previous=first.values,
+            observed=("a.example",),
+            missing_counts=first.missing_counts,
+            policy=policy,
+        )
+        third = reconcile_values(
+            previous=second.values,
+            observed=("a.example",),
+            missing_counts=second.missing_counts,
+            policy=policy,
+        )
+        self.assertIn("old.example", first.values)
+        self.assertIn("old.example", second.values)
+        self.assertNotIn("old.example", third.values)
+        self.assertEqual(("old.example",), third.retired)
+
+    def test_mass_retirement_is_stopped_by_circuit_breaker(self) -> None:
+        with self.assertRaisesRegex(ValueError, "retirement circuit breaker"):
+            reconcile_values(
+                previous=tuple(f"{value}.example" for value in range(10)),
+                observed=("0.example",),
+                missing_counts={f"{value}.example": 2 for value in range(1, 10)},
+                policy=LifecyclePolicy(
+                    retire_after_successes=3, max_retire_ratio=0.2
+                ),
+            )
+
+    def test_repeated_identical_observation_does_not_age_missing_rules(self) -> None:
+        result = reconcile_values(
+            previous=("current.example", "missing.example"),
+            observed=("current.example",),
+            missing_counts={"missing.example": 1},
+            policy=LifecyclePolicy(retire_after_successes=3),
+            advance_missing=False,
+        )
+        self.assertEqual({"missing.example": 1}, result.missing_counts)
+        self.assertIn("missing.example", result.values)
 
     def test_checked_in_outputs_are_reproducible(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

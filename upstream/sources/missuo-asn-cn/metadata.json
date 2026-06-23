@@ -1,0 +1,10 @@
+{
+  "counts": {
+    "asns": 5225
+  },
+  "id": "missuo-asn-cn",
+  "license": "MIT",
+  "project": "https://github.com/missuo/ASN-China",
+  "selected_url": "https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list",
+  "sha256": "47936fe060658b0204ad9491fa9bde19c4c457e9fa5fc4e6ba017e5dae52437e"
+}

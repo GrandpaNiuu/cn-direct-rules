@@ -1,6 +1,6 @@
 # 🇨🇳 CN Direct Rules
 
-一套每天自动更新的中国大陆直连规则。简单说：国内网站尽量直连，其他流量继续走你原来的代理设置。
+一套每天自动更新的中国大陆直连规则超级合集。简单说：把多个可靠项目里的中国域名、IP 和 ASN 自动收集到一起，国内流量尽量直连，其他流量继续走你原来的代理设置。
 
 规则包含域名、IPv4、IPv6、ASN 和 `GEOIP,CN`，不包含局域网规则，也不使用只有部分客户端支持的 `GEOSITE,cn`。
 
@@ -44,7 +44,16 @@
 1. iPhone/iPad：`设置 → 通用 → 后台 App 刷新 → Shadowrocket`，打开开关。
 2. Shadowrocket：`设置 → 自动更新`，打开“模块”或“配置”的后台更新，并把间隔设为 1 天。
 
-如果某次下载失败，不用慌：手机会继续使用已经安装的规则；仓库会自动重试、切换镜像、合并可安全修复的重复或重叠网段。来源仍不可信时，会保留上一份验证通过的规则，等下一次任务继续尝试，不会硬塞一份可能有问题的数据。
+如果某次下载失败，不用慌：手机会继续使用已经安装的规则；仓库会自动重试和切换镜像。某一个来源失败时，只保留它上一次验证通过的数据，其他正常来源仍可更新。
+
+### 🧹 失效规则会怎样处理？
+
+- 一条域名或 ASN 在上游消失一次，不会马上删除，避免把临时故障当成永久失效。
+- 只有连续 **3 次不同且成功的上游更新** 都找不到它，才允许自动退役。
+- 如果一次准备删除超过 1% 或 1000 条，保护开关会拦住整次更新，继续使用旧规则。
+- IP 数量、覆盖范围突然大幅缩水，也会被拦住。
+
+这里不会用“某台机器打不开网站”作为删除依据，因为临时维护、DNS、地区网络和 CDN 都可能造成误判。每次处理结果都写在 [`upstream/update-report.json`](upstream/update-report.json)，可以查到新增、等待确认和已退役的数量。
 
 ## 🧯 更新失败时怎么做
 
@@ -55,9 +64,9 @@
 
 ## 🛡️ 里面有什么规则
 
-- ✅ 中国大陆域名规则，包括 `DOMAIN-SUFFIX,cn`
+- ✅ 11 万级中国大陆导向域名规则，包括 `DOMAIN-SUFFIX,cn`
 - ✅ 已验证的中国大陆公网 IPv4 与 IPv6
-- ✅ 主要中国大陆 ASN
+- ✅ 每日维护的中国 ASN 清单
 - ✅ `GEOIP,CN` 兜底
 - ❌ 不含局域网、CGNAT、回环、链路本地等地址
 - ❌ 不含 `GEOSITE,cn`
@@ -87,7 +96,7 @@
 <details>
 <summary>⚙️ 给维护者看的自动化说明</summary>
 
-每天的 GitHub Actions 会：拉取多个上游 → 安全规范化 → 构建全部 `dist/` 文件 → 运行测试与校验 → 仅在内容变化时提交到 `main`。
+每天的 GitHub Actions 会：分别拉取多个上游 → 校验来源、格式、数量与覆盖变化 → 去重并合并 → 执行连续缺失退役与大删除保护 → 构建全部 `dist/` 文件 → 运行测试与校验 → 仅在内容变化时提交到 `main`。
 
 自动化不会创建 GitHub Release，也不会创建版本 tag。所有订阅始终使用 `main/dist/` 下不变的 Raw 地址。`manifest.json` 记录数据数量和来源摘要，`SHA256SUMS` 覆盖所有发布文件。
 
@@ -103,6 +112,14 @@ python scripts/validate.py
 
 ## 🙏 数据来源与说明
 
-IPv4/IPv6 快照来自 [fernvenue/chn-cidr-list](https://github.com/fernvenue/chn-cidr-list)，域名数据来自采用 MIT License 的 [v2fly/domain-list-community](https://github.com/v2fly/domain-list-community)。安装按钮形式参考 [LOWERTOP/Shadowrocket-First](https://github.com/LOWERTOP/Shadowrocket-First)。
+本仓库只导入上游真实发布的数据，不凭空编写域名、IP 或 ASN：
 
-详细信息见 [第三方许可](THIRD_PARTY_NOTICES.md) 与 [自检说明](docs/SELF_AUDIT.md)。仓库代码和人工规则采用 MIT License。规则只能降低误分流概率，无法保证所有网络、服务或地区在任何时刻都可用。
+- 🌐 结构化中国域名：[v2fly/domain-list-community](https://github.com/v2fly/domain-list-community)
+- 🧭 大陆 DNS 路由域名：[felixonmars/dnsmasq-china-list](https://github.com/felixonmars/dnsmasq-china-list)
+- 📡 APNIC/BGP 中国公网 IP：[fernvenue/chn-cidr-list](https://github.com/fernvenue/chn-cidr-list)
+- 📶 独立 BGP 运营商 IP：[gaoyifan/china-operator-ip](https://github.com/gaoyifan/china-operator-ip)
+- 🛰️ 每日中国 ASN：[missuo/ASN-China](https://github.com/missuo/ASN-China)
+
+安装按钮形式参考 [LOWERTOP/Shadowrocket-First](https://github.com/LOWERTOP/Shadowrocket-First)。二次聚合、来源不清或许可条件不适合本仓库的清单不会为了“看起来更多”而重复加入。
+
+详细信息见 [第三方许可](THIRD_PARTY_NOTICES.md) 与 [自检说明](docs/SELF_AUDIT.md)。仓库代码采用 MIT License。规则只能降低误分流概率，无法保证所有网络、服务或地区在任何时刻都可用。

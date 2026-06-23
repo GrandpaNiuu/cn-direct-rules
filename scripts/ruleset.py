@@ -35,9 +35,6 @@ def read_values(path: Path) -> tuple[str, ...]:
 
 
 def load_rules(root: Path = ROOT) -> RuleSet:
-    manual_exact = read_values(root / "rules" / "exact-domains.txt")
-    manual_suffixes = read_values(root / "rules" / "domain-suffixes.txt")
-    manual_keywords = read_values(root / "rules" / "domain-keywords.txt")
     upstream_exact = read_values(root / "upstream" / "domain-exact.txt")
     upstream_suffixes = read_values(root / "upstream" / "domain-suffixes.txt")
     upstream_keywords = read_values(root / "upstream" / "domain-keywords.txt")
@@ -46,9 +43,9 @@ def load_rules(root: Path = ROOT) -> RuleSet:
     )
     forbidden = set(read_values(root / "config" / "forbidden-domain-suffixes.txt"))
 
-    max_exact = tuple(sorted(set(manual_exact + upstream_exact), key=str.casefold))
-    max_suffixes = tuple(sorted(set(manual_suffixes + upstream_suffixes), key=str.casefold))
-    max_keywords = tuple(sorted(set(manual_keywords + upstream_keywords), key=str.casefold))
+    max_exact = tuple(sorted(set(upstream_exact), key=str.casefold))
+    max_suffixes = tuple(sorted(set(upstream_suffixes), key=str.casefold))
+    max_keywords = tuple(sorted(set(upstream_keywords), key=str.casefold))
     strict_suffixes = tuple(value for value in max_suffixes if value not in forbidden)
 
     return RuleSet(
@@ -78,7 +75,7 @@ def load_rules(root: Path = ROOT) -> RuleSet:
             ipaddress.ip_network(value, strict=True)
             for value in read_values(root / "upstream" / "ipv6.txt")
         ),
-        asns=tuple(int(value) for value in read_values(root / "rules" / "asns.txt")),
+        asns=tuple(int(value) for value in read_values(root / "upstream" / "asns.txt")),
     )
 
 
@@ -135,14 +132,16 @@ def validate_networks(
 def validate_rules(rules: RuleSet, root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     for label, relative_path in (
-        ("manual exact domains", "rules/exact-domains.txt"),
-        ("manual domain suffixes", "rules/domain-suffixes.txt"),
-        ("manual domain keywords", "rules/domain-keywords.txt"),
         ("upstream exact domains", "upstream/domain-exact.txt"),
         ("upstream domain suffixes", "upstream/domain-suffixes.txt"),
         ("upstream domain keywords", "upstream/domain-keywords.txt"),
     ):
         errors.extend(_check_sorted_unique(label, read_values(root / relative_path)))
+    errors.extend(
+        _check_sorted_unique(
+            "upstream ASNs", read_values(root / "upstream" / "asns.txt"), numeric=True
+        )
+    )
 
     errors.extend(_check_sorted_unique("exact domains", rules.exact_domains))
     errors.extend(_check_sorted_unique("domain suffixes", rules.domain_suffixes))
@@ -187,8 +186,9 @@ def validate_rules(rules: RuleSet, root: Path = ROOT) -> list[str]:
     errors.extend(validate_networks(rules.ipv6, 6))
 
     source_config = json.loads((root / "config" / "sources.json").read_text(encoding="utf-8"))
+    aggregate_bounds = source_config["aggregate_bounds"]
     for name, values in (("ipv4", rules.ipv4), ("ipv6", rules.ipv6)):
-        bounds = source_config[name]
+        bounds = aggregate_bounds[name]
         if not bounds["min_entries"] <= len(values) <= bounds["max_entries"]:
             errors.append(
                 f"{name} count {len(values)} is outside the allowed range "
@@ -200,7 +200,7 @@ def validate_rules(rules: RuleSet, root: Path = ROOT) -> list[str]:
         "keywords": len(read_values(root / "upstream" / "domain-keywords.txt")),
     }
     domain_total = sum(upstream_domain_counts.values())
-    domain_bounds = source_config["domains"]
+    domain_bounds = aggregate_bounds["domain"]
     if not domain_bounds["min_entries"] <= domain_total <= domain_bounds["max_entries"]:
         errors.append(
             f"domain source count {domain_total} is outside "
@@ -217,6 +217,69 @@ def validate_rules(rules: RuleSet, root: Path = ROOT) -> list[str]:
         errors.append("domain metadata skipped_regexes must be an integer from 0 to 100")
     elif rules.skipped_domain_regexes != skipped_regexes:
         errors.append("domain metadata skipped_regexes does not match the loaded rules")
+
+    asn_bounds = aggregate_bounds["asn"]
+    if not asn_bounds["min_entries"] <= len(rules.asns) <= asn_bounds["max_entries"]:
+        errors.append(
+            f"asn count {len(rules.asns)} is outside the allowed range "
+            f"{asn_bounds['min_entries']}..{asn_bounds['max_entries']}"
+        )
+    configured_ids = {source["id"] for source in source_config["sources"]}
+    report_path = root / "upstream" / "update-report.json"
+    if not report_path.exists():
+        errors.append("missing upstream/update-report.json")
+    else:
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        if set(report.get("sources", {})) != configured_ids:
+            errors.append("update report does not cover every configured source")
+        expected_report_counts = {
+            "exact": upstream_domain_counts["exact"],
+            "suffixes": upstream_domain_counts["suffixes"],
+            "keywords": upstream_domain_counts["keywords"],
+            "skipped_regexes": skipped_regexes,
+            "ipv4": len(rules.ipv4),
+            "ipv6": len(rules.ipv6),
+            "asns": len(rules.asns),
+        }
+        if report.get("aggregate_counts") != expected_report_counts:
+            errors.append("update report aggregate counts do not match canonical rules")
+    for source in source_config["sources"]:
+        metadata_path = root / "upstream" / "sources" / source["id"] / "metadata.json"
+        if not metadata_path.exists():
+            errors.append(f"missing source metadata for {source['id']}")
+            continue
+        source_metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        if source_metadata.get("project") != source["project"]:
+            errors.append(f"source project mismatch for {source['id']}")
+        if source_metadata.get("license") != source["license"]:
+            errors.append(f"source license mismatch for {source['id']}")
+        digest = source_metadata.get("sha256", "")
+        if len(digest) != 64 or any(character not in "0123456789abcdef" for character in digest):
+            errors.append(f"invalid source content hash for {source['id']}")
+        for category in source.get("categories", [source.get("category")]):
+            if not category:
+                continue
+            snapshot_path = root / "upstream" / "sources" / source["id"] / f"{category}.txt"
+            if not snapshot_path.exists():
+                errors.append(f"missing {category} snapshot for {source['id']}")
+                continue
+            count = len(read_values(snapshot_path))
+            if source_metadata.get("counts", {}).get(category) != count:
+                errors.append(f"source metadata count mismatch for {source['id']} {category}")
+
+    lifecycle_path = root / "upstream" / "lifecycle.json"
+    if not lifecycle_path.exists():
+        errors.append("missing upstream/lifecycle.json")
+    else:
+        lifecycle = json.loads(lifecycle_path.read_text(encoding="utf-8"))
+        if lifecycle.get("schema_version") != 3:
+            errors.append("unsupported lifecycle schema version")
+        if lifecycle.get("policy") != {
+            "retire_after_successes": source_config["policy"]["retire_after_successes"],
+            "max_retire_ratio": source_config["policy"]["max_retire_ratio"],
+            "max_retire_count": source_config["policy"]["max_retire_count"],
+        }:
+            errors.append("lifecycle policy does not match source configuration")
     return errors
 
 

@@ -1,30 +1,124 @@
 {
-  "ipv4": {
-    "urls": [
-      "https://raw.githubusercontent.com/fernvenue/chn-cidr-list/master/ipv4.txt",
-      "https://gitlab.com/fernvenue/chn-cidr-list/-/raw/master/ipv4.txt"
-    ],
-    "min_entries": 5000,
-    "max_entries": 7000,
-    "max_bytes": 1000000
+  "policy": {
+    "retire_after_successes": 3,
+    "max_retire_ratio": 0.01,
+    "max_retire_count": 1000,
+    "max_ip_coverage_drop_ratio": 0.01
   },
-  "ipv6": {
-    "urls": [
-      "https://raw.githubusercontent.com/fernvenue/chn-cidr-list/master/ipv6.txt",
-      "https://gitlab.com/fernvenue/chn-cidr-list/-/raw/master/ipv6.txt"
-    ],
-    "min_entries": 1800,
-    "max_entries": 3200,
-    "max_bytes": 1000000
+  "aggregate_bounds": {
+    "domain": {"min_entries": 90000, "max_entries": 180000},
+    "ipv4": {"min_entries": 5000, "max_entries": 8000},
+    "ipv6": {"min_entries": 1800, "max_entries": 4000},
+    "asn": {"min_entries": 4000, "max_entries": 8000}
   },
-  "domains": {
-    "urls": [
-      "https://codeload.github.com/v2fly/domain-list-community/tar.gz/refs/heads/master",
-      "https://api.github.com/repos/v2fly/domain-list-community/tarball/master"
-    ],
-    "root": "cn",
-    "min_entries": 6000,
-    "max_entries": 12000,
-    "max_bytes": 12000000
-  }
+  "sources": [
+    {
+      "id": "v2fly-cn",
+      "kind": "domain-list-community",
+      "categories": ["domain-exact", "domain-suffixes", "domain-keywords"],
+      "urls": [
+        "https://codeload.github.com/v2fly/domain-list-community/tar.gz/refs/heads/master",
+        "https://api.github.com/repos/v2fly/domain-list-community/tarball/master"
+      ],
+      "root": "cn",
+      "min_entries": 6000,
+      "max_entries": 15000,
+      "max_bytes": 12000000,
+      "license": "MIT",
+      "project": "https://github.com/v2fly/domain-list-community"
+    },
+    {
+      "id": "felixonmars-cn",
+      "kind": "dnsmasq-domains",
+      "categories": ["domain-suffixes"],
+      "urls": [
+        "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf",
+        "https://gitlab.com/felixonmars/dnsmasq-china-list/-/raw/master/accelerated-domains.china.conf"
+      ],
+      "min_entries": 90000,
+      "max_entries": 160000,
+      "max_bytes": 8000000,
+      "license": "WTFPL-2.0",
+      "project": "https://github.com/felixonmars/dnsmasq-china-list"
+    },
+    {
+      "id": "fernvenue-ipv4",
+      "kind": "cidr",
+      "category": "ipv4",
+      "version": 4,
+      "strategy": "consensus",
+      "urls": [
+        "https://raw.githubusercontent.com/fernvenue/chn-cidr-list/master/ipv4.txt",
+        "https://gitlab.com/fernvenue/chn-cidr-list/-/raw/master/ipv4.txt"
+      ],
+      "min_entries": 5000,
+      "max_entries": 7000,
+      "max_bytes": 1000000,
+      "license": "BSD-3-Clause",
+      "project": "https://github.com/fernvenue/chn-cidr-list"
+    },
+    {
+      "id": "fernvenue-ipv6",
+      "kind": "cidr",
+      "category": "ipv6",
+      "version": 6,
+      "strategy": "consensus",
+      "urls": [
+        "https://raw.githubusercontent.com/fernvenue/chn-cidr-list/master/ipv6.txt",
+        "https://gitlab.com/fernvenue/chn-cidr-list/-/raw/master/ipv6.txt"
+      ],
+      "min_entries": 1800,
+      "max_entries": 3200,
+      "max_bytes": 1000000,
+      "license": "BSD-3-Clause",
+      "project": "https://github.com/fernvenue/chn-cidr-list"
+    },
+    {
+      "id": "gaoyifan-ipv4",
+      "kind": "cidr",
+      "category": "ipv4",
+      "version": 4,
+      "strategy": "first",
+      "urls": [
+        "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
+        "https://gaoyifan.github.io/china-operator-ip/china.txt",
+        "https://china-operator-ip.yfgao.com/china.txt"
+      ],
+      "min_entries": 3500,
+      "max_entries": 5500,
+      "max_bytes": 1000000,
+      "license": "MIT",
+      "project": "https://github.com/gaoyifan/china-operator-ip"
+    },
+    {
+      "id": "gaoyifan-ipv6",
+      "kind": "cidr",
+      "category": "ipv6",
+      "version": 6,
+      "strategy": "first",
+      "urls": [
+        "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt",
+        "https://gaoyifan.github.io/china-operator-ip/china6.txt",
+        "https://china-operator-ip.yfgao.com/china6.txt"
+      ],
+      "min_entries": 1200,
+      "max_entries": 2500,
+      "max_bytes": 1000000,
+      "license": "MIT",
+      "project": "https://github.com/gaoyifan/china-operator-ip"
+    },
+    {
+      "id": "missuo-asn-cn",
+      "kind": "asn",
+      "categories": ["asns"],
+      "urls": [
+        "https://raw.githubusercontent.com/missuo/ASN-China/main/ASN.China.list"
+      ],
+      "min_entries": 4000,
+      "max_entries": 8000,
+      "max_bytes": 1000000,
+      "license": "MIT",
+      "project": "https://github.com/missuo/ASN-China"
+    }
+  ]
 }

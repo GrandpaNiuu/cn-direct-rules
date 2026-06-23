@@ -1,0 +1,44 @@
+{
+  "aggregate_counts": {
+    "asns": 5243,
+    "exact": 63,
+    "ipv4": 5690,
+    "ipv6": 2264,
+    "keywords": 29,
+    "skipped_regexes": 3,
+    "suffixes": 114517
+  },
+  "all_sources_refreshed": true,
+  "lifecycle": {
+    "asns": {
+      "added": 0,
+      "retained_missing": 18,
+      "retired": 0
+    },
+    "domain-exact": {
+      "added": 0,
+      "retained_missing": 58,
+      "retired": 0
+    },
+    "domain-keywords": {
+      "added": 0,
+      "retained_missing": 29,
+      "retired": 0
+    },
+    "domain-suffixes": {
+      "added": 0,
+      "retained_missing": 2326,
+      "retired": 0
+    }
+  },
+  "observation_advanced": false,
+  "sources": {
+    "felixonmars-cn": "refreshed",
+    "fernvenue-ipv4": "refreshed",
+    "fernvenue-ipv6": "refreshed",
+    "gaoyifan-ipv4": "refreshed",
+    "gaoyifan-ipv6": "refreshed",
+    "missuo-asn-cn": "refreshed",
+    "v2fly-cn": "refreshed"
+  }
+}

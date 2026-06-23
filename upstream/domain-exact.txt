@@ -4,8 +4,10 @@ ads5-normal-hl.zijieapi.com
 ads5-normal.zijieapi.com
 ai.zhaomi.cn
 apilog-web.acfun.cn
+cn.pool.ntp.org
 ctdsb.clouddiffuse.xyz
 cueme-api.quark.cn
+dns.alidns.com
 end-api.shallow.ink
 end.shallow.ink
 geetest.datasink.sensorsdata.cn

@@ -1,0 +1,13 @@
+{
+  "counts": {
+    "domain-exact": 61,
+    "domain-keywords": 0,
+    "domain-suffixes": 7426
+  },
+  "id": "v2fly-cn",
+  "license": "MIT",
+  "project": "https://github.com/v2fly/domain-list-community",
+  "selected_url": "https://codeload.github.com/v2fly/domain-list-community/tar.gz/refs/heads/master",
+  "sha256": "c181dcf9cae88e07abae8cabc3292a2128fe66e4d02687c93164926aa4d0b9cb",
+  "skipped_regexes": 3
+}

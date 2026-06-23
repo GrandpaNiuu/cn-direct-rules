@@ -1,0 +1,10 @@
+{
+  "counts": {
+    "ipv6": 1517
+  },
+  "id": "gaoyifan-ipv6",
+  "license": "MIT",
+  "project": "https://github.com/gaoyifan/china-operator-ip",
+  "selected_url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt",
+  "sha256": "0d72018ee7554c21c99d24febfe67ecbc674d97df48ce43c0f9e27da12cc7513"
+}
