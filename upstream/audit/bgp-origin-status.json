@@ -1,8 +1,15 @@
 {
-  "action": "kept previous BGP audit snapshots",
-  "error": "IPv4 source contains overlapping network 1.12.0.0/18; IPv4 source contains overlapping network 1.12.0.0/20; IPv4 source contains overlapping network 1.12.34.0/23; IPv4 source contains overlapping network 1.12.64.0/18; IPv4 source contains overlapping network 1.12.128.0/18; IPv4 source contains overlapping network 1.12.192.0/18; IPv4 source contains overlapping network 1.13.0.0/18; IPv4 source contains overlapping network 1.13.64.0/18; IPv4 source contains overlapping network 1.13.128.0/18; IPv4 source contains overlapping network 1.13.148.0/24; IPv4 source contains overlapping network 1.13.192.0/18; IPv4 source contains overlapping network 1.14.0.0/18; IPv4 source contains overlapping network 1.14.64.0/18; IPv4 source contains overlapping network 1.14.128.0/18; IPv4 source contains overlapping network 1.14.192.0/18; IPv4 source contains overlapping network 1.15.0.0/18; IPv4 source contains overlapping network 1.15.64.0/18; IPv4 source contains overlapping network 1.15.128.0/18; IPv4 source contains overlapping network 1.15.192.0/18; IPv4 source contains overlapping network 1.24.32.0/22",
-  "generated_at": "2026-06-23T05:03:47+00:00",
+  "action": "updated BGP audit snapshots",
+  "counts": {
+    "main_asns_seen": 591,
+    "main_prefixes": 67937,
+    "rir_only_asns_seen": 0,
+    "rir_only_prefixes": 0
+  },
+  "generated_at": "2026-06-23T05:18:56+00:00",
   "mode": "fully-automated-bgp-origin-audit",
-  "refreshed": false,
-  "schema_version": 1
+  "refreshed": true,
+  "schema_version": 1,
+  "source_sha256": "6953f0c50b168e43ec5841689a6c36054ad6f512d1d22dac305245627d05a023",
+  "source_url": "https://publicdata.caida.org/datasets/routing/routeviews-prefix2as/2026/06/routeviews-rv2-20260621-1200.pfx2as.gz"
 }
