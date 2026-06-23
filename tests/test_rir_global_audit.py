@@ -25,9 +25,23 @@ class RirGlobalAuditTests(unittest.TestCase):
         self.assertEqual(("2400:3200::/32",), snapshot.ipv6)
         self.assertEqual((4134, 4135), snapshot.asns)
 
-    def test_parse_delegated_rejects_missing_header(self) -> None:
-        with self.assertRaisesRegex(ValueError, "serial date"):
-            parse_delegated("apnic|CN|asn|4134|1|19950701|allocated\n", registry="apnic")
+    def test_parse_delegated_tolerates_missing_header_when_records_exist(self) -> None:
+        snapshot = parse_delegated("apnic|CN|asn|4134|1|19950701|allocated\n", registry="apnic")
+        self.assertEqual("unknown", snapshot.serial_date)
+        self.assertEqual((4134,), snapshot.asns)
+
+    def test_parse_delegated_rejects_missing_header_and_missing_records(self) -> None:
+        with self.assertRaisesRegex(ValueError, "no valid serial date or CN resources"):
+            parse_delegated("not a delegated statistics file\n", registry="apnic")
+
+    def test_parse_delegated_accepts_bom_and_case_variants(self) -> None:
+        snapshot = parse_delegated(
+            "\ufeff2|APNIC|20260623|1|19830613|20260622|+1000\n"
+            "APNIC|cn|asn|4809|1|19950701|ALLOCATED\n",
+            registry="apnic",
+        )
+        self.assertEqual("20260623", snapshot.serial_date)
+        self.assertEqual((4809,), snapshot.asns)
 
     def test_combined_outputs_and_asn_diff_are_deterministic(self) -> None:
         first = parse_delegated(
