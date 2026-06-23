@@ -55,29 +55,35 @@ def parse_delegated(
     statistics is not treated as proof of current geographic routing location.
     """
 
+    registry_id = registry.lower()
+    country_code = country.upper()
+    accepted_statuses = {status.lower() for status in statuses}
+
     serial_date = ""
     ipv4: list[ipaddress.IPv4Network] = []
     ipv6: list[ipaddress.IPv6Network] = []
     asns: set[int] = set()
 
     for raw_line in text.splitlines():
-        line = raw_line.strip()
+        line = raw_line.strip().lstrip("\ufeff")
         if not line or line.startswith("#"):
             continue
-        fields = line.split("|")
-        if len(fields) >= 7 and fields[0] == "2" and fields[1] == registry:
-            serial_date = fields[2]
+        fields = [field.strip() for field in line.split("|")]
+        if len(fields) >= 3 and fields[0] == "2" and fields[1].lower() == registry_id:
+            candidate = fields[2]
+            if len(candidate) == 8 and candidate.isdigit():
+                serial_date = candidate
             continue
         if (
             len(fields) < 7
-            or fields[0] != registry
-            or fields[1] != country
-            or fields[2] not in {"ipv4", "ipv6", "asn"}
-            or fields[6] not in statuses
+            or fields[0].lower() != registry_id
+            or fields[1].upper() != country_code
+            or fields[2].lower() not in {"ipv4", "ipv6", "asn"}
+            or fields[6].lower() not in accepted_statuses
         ):
             continue
 
-        resource_type, start_value, count_value = fields[2], fields[3], fields[4]
+        resource_type, start_value, count_value = fields[2].lower(), fields[3], fields[4]
         if resource_type == "ipv4":
             start = ipaddress.IPv4Address(start_value)
             count = int(count_value)
@@ -98,7 +104,14 @@ def parse_delegated(
             asns.update(range(start_asn, start_asn + count))
 
     if len(serial_date) != 8 or not serial_date.isdigit():
-        raise ValueError(f"{registry} delegated statistics header has no valid serial date")
+        if ipv4 or ipv6 or asns:
+            serial_date = "unknown"
+        else:
+            preview = "\n".join(text.splitlines()[:5])[:500]
+            raise ValueError(
+                f"{registry} delegated statistics file has no valid serial date or CN resources; "
+                f"first lines: {preview!r}"
+            )
 
     collapsed4 = tuple(sorted(ipaddress.collapse_addresses(ipv4), key=network_sort_key))
     collapsed6 = tuple(sorted(ipaddress.collapse_addresses(ipv6), key=network_sort_key))
