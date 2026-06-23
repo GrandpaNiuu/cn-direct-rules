@@ -17,7 +17,7 @@ from zoneinfo import ZoneInfo
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.ruleset import ROOT, network_sort_key, read_values, validate_networks
+from scripts.ruleset import ROOT, network_sort_key, read_values
 
 USER_AGENT = "GrandpaNiuu/cn-direct-rules BGP origin audit"
 ASN_TOKEN = re.compile(r"^(?:AS)?(\d+)$", re.IGNORECASE)
@@ -144,8 +144,8 @@ def build_audit(records: Iterable[OriginRecord], *, main_asns: Iterable[int], ri
             rir_seen.update(rir_hits)
     main_sorted = sort_prefixes(main_prefixes)
     rir_sorted = sort_prefixes(rir_only_prefixes)
-    validate_prefixes(main_sorted)
-    validate_prefixes(rir_sorted)
+    validate_bgp_prefixes(main_sorted)
+    validate_bgp_prefixes(rir_sorted)
     return BgpAudit(
         main_prefixes=main_sorted,
         rir_only_prefixes=rir_sorted,
@@ -161,11 +161,21 @@ def sort_prefixes(prefixes: Iterable[str]) -> tuple[str, ...]:
     return tuple(sorted(set(prefixes), key=lambda value: network_sort_key(ipaddress.ip_network(value))))
 
 
-def validate_prefixes(prefixes: Iterable[str]) -> None:
+def validate_bgp_prefixes(prefixes: Iterable[str]) -> None:
+    """Validate BGP audit prefixes.
+
+    BGP origin snapshots legitimately contain overlapping more-specific routes.
+    Therefore this audit validator checks syntax, public scope, sort order, and
+    uniqueness, but it does not reject overlap.
+    """
     networks = tuple(ipaddress.ip_network(prefix, strict=True) for prefix in prefixes)
-    ipv4 = tuple(network for network in networks if network.version == 4)
-    ipv6 = tuple(network for network in networks if network.version == 6)
-    errors = [*validate_networks(ipv4, 4), *validate_networks(ipv6, 6)]
+    expected = tuple(sorted(set(networks), key=network_sort_key))
+    errors: list[str] = []
+    if networks != expected:
+        errors.append("BGP audit prefixes must be numerically sorted and contain no duplicates")
+    for network in networks:
+        if not network.is_global:
+            errors.append(f"BGP audit prefixes contain non-public network {network}")
     if errors:
         raise ValueError("; ".join(errors[:20]))
 
