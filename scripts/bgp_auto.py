@@ -221,12 +221,23 @@ def run() -> list[Path]:
                 "human_review_required": False,
             },
         }
+        status: dict[str, Any] = {
+            "schema_version": 1,
+            "generated_at": generated_at,
+            "mode": "fully-automated-bgp-origin-audit",
+            "refreshed": True,
+            "source_url": audit.source_url,
+            "source_sha256": audit.sha256,
+            "action": "updated BGP audit snapshots",
+            "counts": summary["counts"],
+        }
         files = {
             ROOT / "upstream" / "bgp-origin" / "prefixes-main-asn.txt": values_text(audit.main_prefixes),
             ROOT / "upstream" / "bgp-origin" / "prefixes-rir-only-asn.txt": values_text(audit.rir_only_prefixes),
             ROOT / "upstream" / "bgp-origin" / "asns-main-seen.txt": values_text(audit.main_asns_seen),
             ROOT / "upstream" / "bgp-origin" / "asns-rir-only-seen.txt": values_text(audit.rir_only_asns_seen),
             ROOT / "upstream" / "audit" / "bgp-origin-summary.json": json.dumps(summary, indent=2, sort_keys=True) + "\n",
+            ROOT / "upstream" / "audit" / "bgp-origin-status.json": json.dumps(status, indent=2, sort_keys=True) + "\n",
         }
     except Exception as error:
         files = {
