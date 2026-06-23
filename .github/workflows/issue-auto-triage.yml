@@ -1,0 +1,63 @@
+name: Issue auto triage
+
+on:
+  issues:
+    types:
+      - opened
+      - edited
+      - reopened
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: issue-auto-triage-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  triage:
+    if: ${{ !github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Run automated triage
+        id: triage
+        run: python scripts/issue_auto_triage.py "$GITHUB_EVENT_PATH"
+
+      - name: Ensure triage label exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LABEL: ${{ steps.triage.outputs.label }}
+        run: |
+          case "$LABEL" in
+            needs-info) COLOR="FEF2C0" ;;
+            ready-for-agent) COLOR="0E8A16" ;;
+            wontfix) COLOR="FFFFFF" ;;
+            *) COLOR="D4C5F9" ;;
+          esac
+          gh label create "$LABEL" --color "$COLOR" --repo "$GITHUB_REPOSITORY" || true
+
+      - name: Apply triage label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          LABEL: ${{ steps.triage.outputs.label }}
+        run: gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --add-label "$LABEL"
+
+      - name: Add triage comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          COMMENT: ${{ steps.triage.outputs.comment }}
+        run: gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body "$COMMENT"
+
+      - name: Close not-planned requests
+        if: ${{ steps.triage.outputs.close == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: gh issue close "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --reason "not planned"
