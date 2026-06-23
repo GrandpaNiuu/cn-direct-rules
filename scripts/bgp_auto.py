@@ -162,8 +162,10 @@ def sort_prefixes(prefixes: Iterable[str]) -> tuple[str, ...]:
 
 
 def validate_prefixes(prefixes: Iterable[str]) -> None:
-    networks = [ipaddress.ip_network(prefix, strict=True) for prefix in prefixes]
-    errors = [*validate_networks((network for network in networks if network.version == 4), 4), *validate_networks((network for network in networks if network.version == 6), 6)]
+    networks = tuple(ipaddress.ip_network(prefix, strict=True) for prefix in prefixes)
+    ipv4 = tuple(network for network in networks if network.version == 4)
+    ipv6 = tuple(network for network in networks if network.version == 6)
+    errors = [*validate_networks(ipv4, 4), *validate_networks(ipv6, 6)]
     if errors:
         raise ValueError("; ".join(errors[:20]))
 
