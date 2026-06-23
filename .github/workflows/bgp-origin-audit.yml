@@ -1,0 +1,87 @@
+name: BGP origin audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      origin_url:
+        description: "URL of a normalized prefix-to-AS text file"
+        required: true
+        type: string
+      source_name:
+        description: "Short source name for the raw snapshot"
+        required: false
+        default: "manual"
+        type: string
+      min_sources:
+        description: "Minimum number of raw sources that must observe a prefix"
+        required: false
+        default: "1"
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bgp-origin-audit
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate input name
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${{ inputs.source_name }}" in
+            (*[!A-Za-z0-9._-]*|"")
+              echo "source_name may only contain letters, numbers, dot, underscore, and dash" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Download normalized BGP origin data
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p upstream/bgp-origin/raw
+          curl -fsSL --retry 3 --retry-delay 5 \
+            "${{ inputs.origin_url }}" \
+            -o "upstream/bgp-origin/raw/${{ inputs.source_name }}.txt"
+
+      - name: Build BGP origin audit outputs
+        run: python scripts/bgp_origin_audit.py --min-sources "${{ inputs.min_sources }}"
+
+      - name: Test BGP origin audit parser
+        run: python -m unittest tests/test_bgp_origin_audit.py -v
+
+      - name: Commit changed audit outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            upstream/bgp-origin/prefixes-main-asn.txt \
+            upstream/bgp-origin/prefixes-rir-only-asn.txt \
+            upstream/bgp-origin/asns-main-seen.txt \
+            upstream/bgp-origin/asns-rir-only-seen.txt \
+            upstream/audit/bgp-origin-summary.json \
+            dist/registry/cn-bgp-origin.conf \
+            dist/registry/cn-bgp-rir-only-origin.conf \
+            dist/bgp-origin-audit-manifest.json
+          if git diff --cached --quiet; then
+            echo "BGP origin audit outputs are unchanged"
+            exit 0
+          fi
+          git commit -m "Update BGP origin audit outputs"
+          git push
