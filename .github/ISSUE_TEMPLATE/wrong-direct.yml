@@ -1,0 +1,45 @@
+name: Wrong direct-route rule
+description: Report a rule that appears to direct-route traffic that should not be direct-routed.
+title: "wrong-direct: "
+labels:
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for suspected false positives. These reports protect the strict rule set from over-broad domains, open TLDs, cloud/CDN anycast, and non-mainland resources.
+  - type: input
+    id: target
+    attributes:
+      label: Problem target
+      description: Domain, domain suffix, CIDR, ASN, or rule line.
+      placeholder: example.com / .app / 203.0.113.0/24 / AS12345
+    validations:
+      required: true
+  - type: dropdown
+    id: target_type
+    attributes:
+      label: Target type
+      options:
+        - domain
+        - domain suffix
+        - IPv4 CIDR
+        - IPv6 CIDR
+        - ASN
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Provide public evidence showing why this target should not be in the direct rules.
+    validations:
+      required: true
+  - type: textarea
+    id: affected_file
+    attributes:
+      label: Affected output
+      description: Mention the file or profile where you saw the rule, such as cn.conf, cn-max.conf, cn-domain.conf, cn-ip.conf, or cn-rir-asn.conf.
+    validations:
+      required: false
