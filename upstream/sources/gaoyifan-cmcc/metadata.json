@@ -1,11 +1,11 @@
 {
   "counts": {
-    "operator-cmcc-ipv4": 1106,
+    "operator-cmcc-ipv4": 1351,
     "operator-cmcc-ipv6": 128
   },
   "id": "gaoyifan-cmcc",
   "license": "MIT",
   "project": "https://github.com/gaoyifan/china-operator-ip",
   "selected_url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/cmcc46.txt",
-  "sha256": "90c6d565d135267b42d7387b08520d2aacab883db52606f1a7f389b040df7094"
+  "sha256": "ed2b13aa8a855e922d6a4d837a679b9c5c6b6bc926af969c26d1ce8ee1e33fa7"
 }

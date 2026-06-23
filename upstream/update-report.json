@@ -2,8 +2,8 @@
   "aggregate_counts": {
     "asns": 5243,
     "exact": 5,
-    "ipv4": 5781,
-    "ipv6": 2264,
+    "ipv4": 5780,
+    "ipv6": 2251,
     "keywords": 29,
     "skipped_regexes": 3,
     "suffixes": 112472

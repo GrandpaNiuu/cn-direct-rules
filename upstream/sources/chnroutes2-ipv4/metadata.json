@@ -1,10 +1,10 @@
 {
   "counts": {
-    "ipv4": 3918
+    "ipv4": 3919
   },
   "id": "chnroutes2-ipv4",
   "license": "CC-BY-SA-4.0",
   "project": "https://github.com/misakaio/chnroutes2",
   "selected_url": "https://raw.githubusercontent.com/misakaio/chnroutes2/master/chnroutes.txt",
-  "sha256": "3c2fd0cd4ebd3f6f35256182f676dfa07e52969c1419c5245ad3d2a42a190b08"
+  "sha256": "cb4a207aa44f27a302f17a690c07c445455d42ab7c709e473b05a7dd546463ba"
 }

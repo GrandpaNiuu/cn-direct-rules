@@ -1,10 +1,10 @@
 {
   "counts": {
-    "ipv4": 5690
+    "ipv4": 5689
   },
   "id": "fernvenue-ipv4",
   "license": "BSD-3-Clause",
   "project": "https://github.com/fernvenue/chn-cidr-list",
   "selected_url": "consensus of available mirrors",
-  "sha256": "8fcde670e99f77b7c7bfd7aa6fd3d23933181d8edd62d77445f60141100763d1"
+  "sha256": "27995b777624ad56d76b1a60f1939f6934591a77e85bc1724726fc4af97c67e8"
 }
