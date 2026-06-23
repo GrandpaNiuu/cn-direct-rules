@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+import argparse
+import hashlib
 import ipaddress
+import json
 from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
 from typing import Any, Iterable
+from zoneinfo import ZoneInfo
 
-from scripts.ruleset import network_sort_key, validate_networks
+from scripts.ruleset import ROOT, network_sort_key, read_values, validate_networks
 
 
 ACCEPTED_STATUSES = {"allocated", "assigned"}
+RIR_IDS = ("apnic", "arin", "ripencc", "lacnic", "afrinic")
 
 
 @dataclass(frozen=True)
@@ -181,3 +188,100 @@ def render_outputs(audit: AuditResult) -> dict[str, str]:
         "dist/registry/cn-global-allocated.conf": "\n".join(ip_lines),
         "dist/registry/cn-rir-asn.conf": "\n".join(asn_lines),
     }
+
+
+def _write(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8", newline="\n")
+
+
+def _values_text(values: Iterable[str | int]) -> str:
+    materialized = [str(value) for value in values]
+    return "\n".join(materialized) + ("\n" if materialized else "")
+
+
+def load_audit(raw_dir: Path, *, country: str) -> AuditResult:
+    snapshots = []
+    for registry in RIR_IDS:
+        path = raw_dir / f"{registry}.txt"
+        if not path.exists():
+            raise FileNotFoundError(f"missing raw RIR delegated file: {path}")
+        snapshots.append(
+            parse_delegated(
+                path.read_text(encoding="utf-8", errors="replace"),
+                registry=registry,
+                country=country,
+            )
+        )
+    return combine_snapshots(snapshots)
+
+
+def manifest(audit: AuditResult, outputs: dict[str, str], diff: dict[str, Any], *, country: str) -> dict[str, Any]:
+    return {
+        "schema_version": 1,
+        "generated_at": datetime.now(ZoneInfo("UTC")).replace(microsecond=0).isoformat(),
+        "country": country,
+        "counts": {"ipv4": len(audit.ipv4), "ipv6": len(audit.ipv6), "asns": len(audit.asns)},
+        "asn_diff_counts": diff["counts"],
+        "sources": {
+            snapshot.registry: {
+                "serial_date": snapshot.serial_date,
+                "counts": {"ipv4": len(snapshot.ipv4), "ipv6": len(snapshot.ipv6), "asns": len(snapshot.asns)},
+            }
+            for snapshot in audit.snapshots
+        },
+        "files": {
+            name: hashlib.sha256(content.encode("utf-8")).hexdigest()
+            for name, content in sorted(outputs.items())
+        },
+    }
+
+
+def write_outputs(root: Path, audit: AuditResult, *, country: str) -> list[Path]:
+    outputs = render_outputs(audit)
+    main_asns_path = root / "upstream" / "asns.txt"
+    main_asns = [int(value) for value in read_values(main_asns_path)] if main_asns_path.exists() else []
+    diff = asn_diff(main_asns, audit.asns)
+    audit_manifest = manifest(audit, outputs, diff, country=country)
+
+    generated: dict[Path, str] = {
+        root / "upstream" / "rir-global" / "ipv4.txt": _values_text(audit.ipv4),
+        root / "upstream" / "rir-global" / "ipv6.txt": _values_text(audit.ipv6),
+        root / "upstream" / "rir-global" / "asns.txt": _values_text(audit.asns),
+        root / "upstream" / "audit" / "asn-diff.json": json.dumps(diff, indent=2, sort_keys=True) + "\n",
+        root / "upstream" / "audit" / "rir-cn-summary.json": json.dumps(audit_manifest, indent=2, sort_keys=True) + "\n",
+        root / "dist" / "rir-audit-manifest.json": json.dumps(audit_manifest, indent=2, sort_keys=True) + "\n",
+    }
+    generated.update({root / relative_name: content for relative_name, content in outputs.items()})
+    for snapshot in audit.snapshots:
+        prefix = root / "upstream" / "rir-global" / "sources" / snapshot.registry
+        generated[prefix / "ipv4.txt"] = _values_text(snapshot.ipv4)
+        generated[prefix / "ipv6.txt"] = _values_text(snapshot.ipv6)
+        generated[prefix / "asns.txt"] = _values_text(snapshot.asns)
+
+    changed: list[Path] = []
+    for path, content in generated.items():
+        if path.exists() and path.read_text(encoding="utf-8") == content:
+            continue
+        _write(path, content)
+        changed.append(path)
+    return changed
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Build global RIR CN registration audit outputs")
+    parser.add_argument("--country", default="CN", help="ISO 3166 alpha-2 country code")
+    parser.add_argument("--raw-dir", type=Path, default=ROOT / "upstream" / "rir-global" / "raw")
+    args = parser.parse_args()
+
+    country = args.country.upper()
+    audit = load_audit(args.raw_dir, country=country)
+    changed = write_outputs(ROOT, audit, country=country)
+    if changed:
+        print("Updated RIR audit: " + ", ".join(str(path.relative_to(ROOT)) for path in changed))
+    else:
+        print("RIR audit outputs are already current")
+
+
+if __name__ == "__main__":
+    main()
