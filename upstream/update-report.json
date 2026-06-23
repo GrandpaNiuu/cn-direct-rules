@@ -2,18 +2,18 @@
   "aggregate_counts": {
     "asns": 5243,
     "exact": 5,
-    "ipv4": 5780,
+    "ipv4": 5784,
     "ipv6": 2251,
     "keywords": 29,
     "skipped_regexes": 3,
-    "suffixes": 112472
+    "suffixes": 112474
   },
-  "all_sources_refreshed": true,
+  "all_sources_refreshed": false,
   "category_observation_advanced": {
-    "asns": false,
-    "domain-exact": false,
-    "domain-keywords": false,
-    "domain-suffixes": false
+    "asns": true,
+    "domain-exact": true,
+    "domain-keywords": true,
+    "domain-suffixes": true
   },
   "excluded_from_aggregate": [
     "felixonmars-google-cn"
@@ -40,15 +40,15 @@
       "retired": 0
     },
     "domain-suffixes": {
-      "added": 1,
+      "added": 3,
       "removed_excluded_source": 0,
       "removed_high_risk": 0,
       "repaired_redundant": 1,
-      "retained_missing": 121,
+      "retained_missing": 178,
       "retired": 0
     }
   },
-  "observation_advanced": false,
+  "observation_advanced": true,
   "registry_coverage": {
     "ipv4": {
       "missing_addresses": 0,
@@ -62,7 +62,7 @@
     }
   },
   "sources": {
-    "apnic-cn-registry": "refreshed",
+    "apnic-cn-registry": "retained after refresh failure: ValueError",
     "chnroutes2-ipv4": "refreshed",
     "felixonmars-apple-cn": "refreshed",
     "felixonmars-cn": "refreshed",

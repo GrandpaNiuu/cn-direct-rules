@@ -1,10 +1,10 @@
 {
   "counts": {
-    "domain-suffixes": 111920
+    "domain-suffixes": 111865
   },
   "id": "felixonmars-cn",
   "license": "WTFPL-2.0",
   "project": "https://github.com/felixonmars/dnsmasq-china-list",
   "selected_url": "https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf",
-  "sha256": "8e1ccaa3de7fa6adabab7f156ad1ff6a8f2bac11c7d917e1423f338835cb79c6"
+  "sha256": "bed3a15da079ff374a9cf74330dd80ae11a0ebc3fc383af950bb44e38097b16e"
 }
