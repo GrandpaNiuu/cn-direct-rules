@@ -2,10 +2,10 @@
   "counts": {
     "main_asns_seen": 590,
     "main_prefixes": 68172,
-    "rir_only_asns_seen": 1,
-    "rir_only_prefixes": 1
+    "rir_only_asns_seen": 3,
+    "rir_only_prefixes": 91
   },
-  "generated_at": "2026-07-02T17:25:52+00:00",
+  "generated_at": "2026-07-03T17:12:28+00:00",
   "mode": "fully-automated-bgp-origin-audit",
   "promotion_policy": {
     "bgp_origin_outputs": "automatic audit only",
