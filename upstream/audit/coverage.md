@@ -12,7 +12,7 @@ This report is generated without manual review. High-risk data is kept in audit 
 
 ## Main-rule coverage against RIR registry
 
-- IPv4 missing ratio: 0.000037
+- IPv4 missing ratio: 0.000038
 - IPv6 missing ratio: 0.000701
 - ASN overlap: 5224 / 6623
 
