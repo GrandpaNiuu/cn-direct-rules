@@ -5,7 +5,7 @@
     "rir_only_asns_seen": 6,
     "rir_only_prefixes": 100
   },
-  "generated_at": "2026-07-20T17:19:38+00:00",
+  "generated_at": "2026-07-21T17:06:27+00:00",
   "mode": "fully-automated-bgp-origin-audit",
   "promotion_policy": {
     "bgp_origin_outputs": "automatic audit only",
