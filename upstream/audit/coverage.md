@@ -14,5 +14,5 @@ This report is generated without manual review. High-risk data is kept in audit 
 
 - IPv4 missing ratio: 0.000137
 - IPv6 missing ratio: 0.000715
-- ASN overlap: 5224 / 6621
+- ASN overlap: 5223 / 6621
 
