@@ -1455,7 +1455,7 @@
     }
   },
   "failures": {},
-  "generated_at": "2026-08-08T16:19:54+00:00",
+  "generated_at": "2026-08-09T16:21:08+00:00",
   "mode": "fully-automated-audit",
   "promotion_policy": {
     "audit_outputs": "automatic",
@@ -1470,8 +1470,8 @@
         "ipv4": 0,
         "ipv6": 0
       },
-      "serial_date": "20260808",
-      "sha256": "c60d0245a6c82d2c4a55f5aece5bbc3b505f1e2265eda84b76a30b9c73134da7",
+      "serial_date": "20260809",
+      "sha256": "7646dc22f6eb3aab2ee19b488d9c480bd7e89bbb8f1cbd2b4f98eeb9dd3c4f77",
       "url": "https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
     },
     "apnic": {
@@ -1481,7 +1481,7 @@
         "ipv6": 2012
       },
       "serial_date": "unknown",
-      "sha256": "c70bf9088b1fd944d4ca4c74be6fa679ea4b24f61107f6fa36a38613c10dd13c",
+      "sha256": "b6f44dff49f2eebcb3a2cacc2aba601072f61962a69a400b88111fefd004e004",
       "url": "https://ftp.apnic.net/stats/apnic/delegated-apnic-extended-latest"
     },
     "arin": {
@@ -1491,7 +1491,7 @@
         "ipv6": 1
       },
       "serial_date": "unknown",
-      "sha256": "5265afc0db6862b629d781377ccf757b9a0c8aa3076e5faea9b565674bae55e9",
+      "sha256": "fb2abdbdd2d810db8381f2f0d51f3491dd59fa9229ea239155b1d3a1c3e6b98c",
       "url": "https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
     },
     "lacnic": {
@@ -1501,7 +1501,7 @@
         "ipv6": 0
       },
       "serial_date": "unknown",
-      "sha256": "853cb78efaa1a27376b3a9136d22eedffd15f2e42cf8f2aed859090536081067",
+      "sha256": "11b5f6bc311cb0b703767711b92fe1e0f7eb68a4fb80afb24a7014a6e667d795",
       "url": "https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
     },
     "ripencc": {
@@ -1511,7 +1511,7 @@
         "ipv6": 17
       },
       "serial_date": "unknown",
-      "sha256": "43b5893abc63f59c4f44423f09603408ba91eb69d4fc5ee6ec8b495d8eec6f91",
+      "sha256": "3c0ed98bd01495ad2b2180797fbfa4daf5df5a202681f0a60477eb2c8f1acefe",
       "url": "https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest"
     }
   }
