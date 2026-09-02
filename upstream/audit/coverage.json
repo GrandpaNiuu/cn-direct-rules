@@ -4,8 +4,8 @@
       "intersection": 5219,
       "main": 5243,
       "only_in_main": 24,
-      "only_in_rir": 1403,
-      "rir": 6622
+      "only_in_rir": 1404,
+      "rir": 6623
     },
     "only_in_main": [
       10099,
@@ -1417,6 +1417,7 @@
       215995,
       216256,
       216276,
+      218796,
       218816,
       218834,
       218867,
@@ -1443,7 +1444,7 @@
     "main_asns": 5243,
     "main_ipv4": 5784,
     "main_ipv6": 2251,
-    "rir_asns": 6622,
+    "rir_asns": 6623,
     "rir_ipv4": 5512,
     "rir_ipv6": 2032,
     "sources_failed": 0,
@@ -1462,7 +1463,7 @@
     }
   },
   "failures": {},
-  "generated_at": "2026-09-01T18:58:28+00:00",
+  "generated_at": "2026-09-02T19:04:05+00:00",
   "mode": "fully-automated-audit",
   "promotion_policy": {
     "audit_outputs": "automatic",
@@ -1477,8 +1478,8 @@
         "ipv4": 0,
         "ipv6": 0
       },
-      "serial_date": "20260901",
-      "sha256": "60e564ae703df63fa32abe4044774b2e65c891c607286dc236c1294337c19567",
+      "serial_date": "20260902",
+      "sha256": "b3e96f32f10b833c55107588f314d7c006df9a4702817dc44480c5d485c6c95f",
       "url": "https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
     },
     "apnic": {
@@ -1488,7 +1489,7 @@
         "ipv6": 2014
       },
       "serial_date": "unknown",
-      "sha256": "947865336f874b049d015ddc71f22f5f4317af5f5717bc87b58d89fcd41d87e5",
+      "sha256": "f6f61a8fb060124be12495c22ae0f088811fdaf5d8597d124f888538bc181e98",
       "url": "https://ftp.apnic.net/stats/apnic/delegated-apnic-extended-latest"
     },
     "arin": {
@@ -1498,7 +1499,7 @@
         "ipv6": 1
       },
       "serial_date": "unknown",
-      "sha256": "ab1203fd4b84d1d808ffb0ce7793d8ac1fc64940af27bcbd9154daad314ddf7b",
+      "sha256": "71e06d21ff98a887bfad07a43d57900360fa9a1d6a9fea1071f00e85cfc76811",
       "url": "https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
     },
     "lacnic": {
@@ -1508,17 +1509,17 @@
         "ipv6": 0
       },
       "serial_date": "unknown",
-      "sha256": "ab9368a4b487133c984095e2db8defa9f2b76f856e080ca7dc93b66b117ad223",
+      "sha256": "a1ee6795638e37d8b0d72380298a504f4ed5b4ac11f0bcd92b8a6cdfeb0b382f",
       "url": "https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
     },
     "ripencc": {
       "counts": {
-        "asns": 228,
+        "asns": 229,
         "ipv4": 18,
         "ipv6": 17
       },
       "serial_date": "unknown",
-      "sha256": "3895018f1afd21ebb9c099d26a18f86f9056f034b1b50783d579fe71596d010a",
+      "sha256": "fac6c6fd5b059bf2be8b4f2c62691405464d19d78418518f889394162127753f",
       "url": "https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest"
     }
   }
