@@ -1,15 +1,15 @@
 {
   "action": "updated BGP audit snapshots",
   "counts": {
-    "main_asns_seen": 564,
-    "main_prefixes": 69767,
+    "main_asns_seen": 565,
+    "main_prefixes": 69849,
     "rir_only_asns_seen": 16,
-    "rir_only_prefixes": 119
+    "rir_only_prefixes": 120
   },
-  "generated_at": "2026-09-18T18:44:00+00:00",
+  "generated_at": "2026-09-19T18:16:43+00:00",
   "mode": "fully-automated-bgp-origin-audit",
   "refreshed": true,
   "schema_version": 1,
-  "source_sha256": "ee86a2c73c750cbc4c3acb189d47c175ffcc8635a6264605f369dcaf2ede001b",
-  "source_url": "https://publicdata.caida.org/datasets/routing/routeviews-prefix2as/2026/09/routeviews-rv2-20260917-1200.pfx2as.gz"
+  "source_sha256": "e3fa6557196a333bc124f443b00f825012f7ad7c7db018781914f5c03b556e18",
+  "source_url": "https://publicdata.caida.org/datasets/routing/routeviews-prefix2as/2026/09/routeviews-rv2-20260918-1200.pfx2as.gz"
 }
