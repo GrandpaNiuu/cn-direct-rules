@@ -1,19 +1,19 @@
 {
   "counts": {
     "main_asns_seen": 559,
-    "main_prefixes": 69845,
+    "main_prefixes": 69840,
     "rir_only_asns_seen": 16,
     "rir_only_prefixes": 120
   },
-  "generated_at": "2026-10-03T18:52:58+00:00",
+  "generated_at": "2026-10-04T18:53:12+00:00",
   "mode": "fully-automated-bgp-origin-audit",
   "promotion_policy": {
     "bgp_origin_outputs": "automatic audit only",
     "human_review_required": false,
     "strict_rules": "main source pipeline only"
   },
-  "records_seen": 1126172,
+  "records_seen": 1126620,
   "schema_version": 1,
-  "source_sha256": "508642acf8bcb0a0c808f471ac4ec0f0a5234ba4191872f2313aa9c5c5d36d2d",
-  "source_url": "https://publicdata.caida.org/datasets/routing/routeviews-prefix2as/2026/10/routeviews-rv2-20261002-1200.pfx2as.gz"
+  "source_sha256": "617950664a9dfe357033227f1bb13463c842d94c195d1f7f0cd1ab899e876b09",
+  "source_url": "https://publicdata.caida.org/datasets/routing/routeviews-prefix2as/2026/10/routeviews-rv2-20261003-1200.pfx2as.gz"
 }
