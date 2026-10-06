@@ -1468,7 +1468,7 @@
     }
   },
   "failures": {},
-  "generated_at": "2026-10-05T22:14:53+00:00",
+  "generated_at": "2026-10-06T20:38:19+00:00",
   "mode": "fully-automated-audit",
   "promotion_policy": {
     "audit_outputs": "automatic",
@@ -1483,8 +1483,8 @@
         "ipv4": 0,
         "ipv6": 0
       },
-      "serial_date": "20261005",
-      "sha256": "64bc2fc82b8d3c86d0980b3b0298c72d531b8a545f6c531a1ed69799832f31d4",
+      "serial_date": "20261006",
+      "sha256": "abd745664886c4226071fcf20b8c1787266722e8706454da7c84f762e5765a53",
       "url": "https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest"
     },
     "apnic": {
@@ -1494,7 +1494,7 @@
         "ipv6": 2015
       },
       "serial_date": "unknown",
-      "sha256": "b752f17cc7a5ebe764ca0a9335501d1f20cc290208963868df784479d040c132",
+      "sha256": "e211e4c4cfd1768c4d00944c671ee23e57e1edbd5480241856fa6909f22ff123",
       "url": "https://ftp.apnic.net/stats/apnic/delegated-apnic-extended-latest"
     },
     "arin": {
@@ -1504,7 +1504,7 @@
         "ipv6": 1
       },
       "serial_date": "unknown",
-      "sha256": "93a4b8c9c6fc57fabefda4eb02a28831179b5186b540016114abbb8d6fcb60d3",
+      "sha256": "c262c6024f47fef54ac297c760cf310f9e38edcc9116b167d55b402477376b81",
       "url": "https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
     },
     "lacnic": {
@@ -1514,7 +1514,7 @@
         "ipv6": 0
       },
       "serial_date": "unknown",
-      "sha256": "2d271da54c2257a6263b1c3d123f0f25c9fe82dd25731b11c96cf334815a7f7d",
+      "sha256": "5a1eddb6e0cc1721a9109177438ccb944a53eee9cd5583ab23b7b8ddf1d77380",
       "url": "https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
     },
     "ripencc": {
