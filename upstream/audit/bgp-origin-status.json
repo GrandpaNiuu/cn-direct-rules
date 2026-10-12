@@ -3,13 +3,13 @@
   "counts": {
     "main_asns_seen": 562,
     "main_prefixes": 69746,
-    "rir_only_asns_seen": 19,
-    "rir_only_prefixes": 125
+    "rir_only_asns_seen": 20,
+    "rir_only_prefixes": 126
   },
-  "generated_at": "2026-10-11T19:47:45+00:00",
+  "generated_at": "2026-10-12T22:39:11+00:00",
   "mode": "fully-automated-bgp-origin-audit",
   "refreshed": true,
   "schema_version": 1,
-  "source_sha256": "c5601e25f693da1c093e3a971ff256f6eec9f8ae4ba67319293cd3b727d764aa",
-  "source_url": "https://publicdata.caida.org/datasets/routing/routeviews-prefix2as/2026/10/routeviews-rv2-20261010-1200.pfx2as.gz"
+  "source_sha256": "31517c8ffbf68177d1a838967412cf33768761eb833b827ad1a954fad26b9a26",
+  "source_url": "https://publicdata.caida.org/datasets/routing/routeviews-prefix2as/2026/10/routeviews-rv2-20261011-1200.pfx2as.gz"
 }
