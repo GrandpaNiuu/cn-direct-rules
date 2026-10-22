@@ -8,11 +8,11 @@ This report is generated without manual review. High-risk data is kept in audit 
 - RIR sources failed: 0
 - Global RIR CN IPv4 networks: 5517
 - Global RIR CN IPv6 networks: 2036
-- Global RIR CN ASNs: 6628
+- Global RIR CN ASNs: 6627
 
 ## Main-rule coverage against RIR registry
 
 - IPv4 missing ratio: 0.000153
 - IPv6 missing ratio: 0.000934
-- ASN overlap: 5217 / 6628
+- ASN overlap: 5217 / 6627
 
