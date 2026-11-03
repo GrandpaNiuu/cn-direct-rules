@@ -1471,7 +1471,7 @@
     }
   },
   "failures": {},
-  "generated_at": "2026-11-02T23:15:11+00:00",
+  "generated_at": "2026-11-03T21:21:04+00:00",
   "mode": "fully-automated-audit",
   "promotion_policy": {
     "audit_outputs": "automatic",
@@ -1497,7 +1497,7 @@
         "ipv6": 2018
       },
       "serial_date": "unknown",
-      "sha256": "8332782a95d42fb8df5a5204086fdc15ba60ce0f9834278362801044c8e1ab9e",
+      "sha256": "b25699e8c835c27f778604edbd12f138dc63d539f01571fbe2c995f0a405996f",
       "url": "https://ftp.apnic.net/stats/apnic/delegated-apnic-extended-latest"
     },
     "arin": {
@@ -1507,7 +1507,7 @@
         "ipv6": 1
       },
       "serial_date": "unknown",
-      "sha256": "975a01f730560a1272b9114c30563df01cdd08beafc0e0b700b9388c22e68e8b",
+      "sha256": "4451a18dd96467ce0e986ca3322a622c6ed9676c12014dee7a594e9d7b174880",
       "url": "https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
     },
     "lacnic": {
@@ -1517,7 +1517,7 @@
         "ipv6": 0
       },
       "serial_date": "unknown",
-      "sha256": "de818fc76f18f2b8113c122b017889724aae0eab80d9591f002f7590b4bbd045",
+      "sha256": "0a9db7330b4b06d9cf747fcfc63167855a0c474332d4f66ec383df071dbb374a",
       "url": "https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
     },
     "ripencc": {
