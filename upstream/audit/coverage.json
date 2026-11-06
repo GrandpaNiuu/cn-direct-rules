@@ -4,8 +4,8 @@
       "intersection": 5217,
       "main": 5243,
       "only_in_main": 26,
-      "only_in_rir": 1409,
-      "rir": 6626
+      "only_in_rir": 1410,
+      "rir": 6627
     },
     "only_in_main": [
       10099,
@@ -1418,6 +1418,7 @@
       215995,
       216256,
       216276,
+      218167,
       218380,
       218381,
       218515,
@@ -1451,7 +1452,7 @@
     "main_asns": 5243,
     "main_ipv4": 5784,
     "main_ipv6": 2251,
-    "rir_asns": 6626,
+    "rir_asns": 6627,
     "rir_ipv4": 5516,
     "rir_ipv6": 2036,
     "sources_failed": 0,
@@ -1470,7 +1471,7 @@
     }
   },
   "failures": {},
-  "generated_at": "2026-11-05T21:40:37+00:00",
+  "generated_at": "2026-11-06T21:09:19+00:00",
   "mode": "fully-automated-audit",
   "promotion_policy": {
     "audit_outputs": "automatic",
@@ -1496,7 +1497,7 @@
         "ipv6": 2018
       },
       "serial_date": "unknown",
-      "sha256": "5ef1336141ea7ee7ad1666aa9357a83900c03ddf41b20cd2794783c8ce34ef6f",
+      "sha256": "d7ef4ca31a7b77fa835cdb9109aa2e15aa0a321da9269f203ce3946520436eb8",
       "url": "https://ftp.apnic.net/stats/apnic/delegated-apnic-extended-latest"
     },
     "arin": {
@@ -1506,7 +1507,7 @@
         "ipv6": 1
       },
       "serial_date": "unknown",
-      "sha256": "482146063cebc45ef03f7f5a961af46762e43aca9a9faba1fc59aeca6f1445d4",
+      "sha256": "087089183b3a75c4820f4f705b6224d90a743ae18b17b15a7f8c9b371b99fc04",
       "url": "https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
     },
     "lacnic": {
@@ -1516,17 +1517,17 @@
         "ipv6": 0
       },
       "serial_date": "unknown",
-      "sha256": "57ba56616c2b29b08b5656ec040aa764b68203c9b74dc4451a66735cd07553ab",
+      "sha256": "31b3b017c66f286484b8b3bd8dd8d2ac636d4f233823279596d58467ff73bc52",
       "url": "https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
     },
     "ripencc": {
       "counts": {
-        "asns": 228,
+        "asns": 229,
         "ipv4": 17,
         "ipv6": 17
       },
       "serial_date": "unknown",
-      "sha256": "113174efcd825d1f792cc97d58c033f63e602a4b84fa8b9557c7d00fb0226399",
+      "sha256": "4ecf51d766c898647dfbbf8abdd58ba36f237aae9fdfb6d21dc7d4a5e4c52ce7",
       "url": "https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest"
     }
   }
