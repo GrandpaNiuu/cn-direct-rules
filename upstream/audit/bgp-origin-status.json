@@ -6,10 +6,10 @@
     "rir_only_asns_seen": 20,
     "rir_only_prefixes": 172
   },
-  "generated_at": "2026-11-10T21:33:05+00:00",
+  "generated_at": "2026-11-11T22:21:47+00:00",
   "mode": "fully-automated-bgp-origin-audit",
   "refreshed": true,
   "schema_version": 1,
-  "source_sha256": "f1f80af0e0d1e31f09fbba473adaca4c5a09559dccd675367499b915d4cb62ea",
-  "source_url": "https://publicdata.caida.org/datasets/routing/routeviews-prefix2as/2026/11/routeviews-rv2-20261109-1200.pfx2as.gz"
+  "source_sha256": "534a4ac53e2964d0086adc0fa24ba14ee090e8816e82e204f4eeacaeb62c33a9",
+  "source_url": "https://publicdata.caida.org/datasets/routing/routeviews-prefix2as/2026/11/routeviews-rv2-20261110-1200.pfx2as.gz"
 }
