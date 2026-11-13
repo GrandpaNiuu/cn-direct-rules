@@ -1455,16 +1455,16 @@
     "main_ipv4": 5784,
     "main_ipv6": 2251,
     "rir_asns": 6629,
-    "rir_ipv4": 5520,
+    "rir_ipv4": 5518,
     "rir_ipv6": 2038,
     "sources_failed": 0,
     "sources_refreshed": 5
   },
   "coverage": {
     "ipv4": {
-      "missing_addresses": 54528,
-      "missing_ratio": 0.0001589800200180476,
-      "registered_addresses": 342986496
+      "missing_addresses": 54016,
+      "missing_ratio": 0.0001574874849696482,
+      "registered_addresses": 342985984
     },
     "ipv6": {
       "missing_addresses": 5232059279825729790785521451008,
@@ -1473,7 +1473,7 @@
     }
   },
   "failures": {},
-  "generated_at": "2026-11-12T21:57:46+00:00",
+  "generated_at": "2026-11-13T21:43:24+00:00",
   "mode": "fully-automated-audit",
   "promotion_policy": {
     "audit_outputs": "automatic",
@@ -1499,7 +1499,7 @@
         "ipv6": 2020
       },
       "serial_date": "unknown",
-      "sha256": "e143bc8a40c4e2a000ea1b1a6d04e24273859a2976c4244310bb68748fa80eb3",
+      "sha256": "56d3e3c5360cdd46a8eb1d39ebc3ab776e9d52aeba717625f5ae7c7c78314164",
       "url": "https://ftp.apnic.net/stats/apnic/delegated-apnic-extended-latest"
     },
     "arin": {
@@ -1509,7 +1509,7 @@
         "ipv6": 1
       },
       "serial_date": "unknown",
-      "sha256": "181a2f71061541e70282880056c9ee2d2ab05fe6c31d3efed242a14d67d0c23a",
+      "sha256": "7c52d91c888d40befbc530a2c4d3e51b9589cd0842f20b6680ed24c00b1c788a",
       "url": "https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest"
     },
     "lacnic": {
@@ -1519,17 +1519,17 @@
         "ipv6": 0
       },
       "serial_date": "unknown",
-      "sha256": "70d4e10b24cabf736a27b62943cbda8156fae47b6064d374d4fb985c0357a4b4",
+      "sha256": "101134148a7f8c464b997fab072e121c262767ed5f94779dcfd1e53003872a12",
       "url": "https://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest"
     },
     "ripencc": {
       "counts": {
         "asns": 229,
-        "ipv4": 19,
+        "ipv4": 17,
         "ipv6": 17
       },
       "serial_date": "unknown",
-      "sha256": "fb4e864c5c5198c60e7fc2847acd9ef093716481d3a92256991ed635902e03b5",
+      "sha256": "e199333f91a012bd4c7f18071a7b2f0ecc848f475a93524557bf29d1cced3bf0",
       "url": "https://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-extended-latest"
     }
   }
