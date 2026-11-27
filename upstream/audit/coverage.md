@@ -4,10 +4,10 @@ This report is generated without manual review. High-risk data is kept in audit 
 
 ## RIR CN registry audit
 
-- RIR sources refreshed: 5
-- RIR sources failed: 0
-- Global RIR CN IPv4 networks: 5518
-- Global RIR CN IPv6 networks: 2038
+- RIR sources refreshed: 4
+- RIR sources failed: 1
+- Global RIR CN IPv4 networks: 5517
+- Global RIR CN IPv6 networks: 2037
 - Global RIR CN ASNs: 6627
 
 ## Main-rule coverage against RIR registry
@@ -15,4 +15,8 @@ This report is generated without manual review. High-risk data is kept in audit 
 - IPv4 missing ratio: 0.000159
 - IPv6 missing ratio: 0.001094
 - ASN overlap: 5217 / 6627
+
+## Source failures
+
+- afrinic: all mirrors failed: https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest: failed to download https://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-extended-latest after 3 attempts
 
